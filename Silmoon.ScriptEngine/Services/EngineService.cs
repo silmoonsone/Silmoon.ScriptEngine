@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Silmoon.Extension;
 using Silmoon.Runtime;
+using Silmoon.Runtime.Extensions;
 using Silmoon.Secure;
 using System;
 using System.Collections.Generic;
@@ -20,8 +21,8 @@ namespace Silmoon.ScriptEngine.Services
         IHostApplicationLifetime HostApplicationLifetime;
 
         Compiler compiler = new Compiler();
-        object Instance = null;
-        Type Type = null;
+        object instance = null;
+        Type type = null;
 
         public EngineService(ILogger<EngineService> logger, IOptions<EngineServiceOptions> _options, IHostApplicationLifetime hostApplicationLifetime)
         {
@@ -36,26 +37,23 @@ namespace Silmoon.ScriptEngine.Services
             {
                 var fileInfos = CheckScriptFiles();
                 var complierResult = await CompilerScript(fileInfos);
-                if (complierResult.Success) _ = RunBinary(complierResult);
+                if (complierResult.Success) _ = RunAssembly(complierResult);
                 else HostApplicationLifetime.StopApplication();
             });
             await Task.CompletedTask;
         }
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (Instance is not null) await StopScript();
+            if (instance is not null) await StopScript();
 
             _logger.LogInformation("EngineService stopped");
             await Task.CompletedTask;
         }
         public async Task StopScript()
         {
-            if (!Options.StopMethod.IsNullOrEmpty()) Type.GetMethod(Options.StopMethod)?.Invoke(Instance, Options.StopMethodParameter);
+            Options.StopExecuteMethods.Each(method => type.Invoke(instance, method));
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("RUNNING STOP...");
-            Console.WriteLine();
-            Console.ResetColor();
+            Console.WriteLine(ConsoleHelper.WarpStringANSIColor("RUNNING STOP...", null, ConsoleColor.Green));
 
             _logger.LogInformation("Stopping script");
             await Task.CompletedTask;
@@ -85,31 +83,28 @@ namespace Silmoon.ScriptEngine.Services
         {
             _logger.LogInformation($"Start compiling {scriptFiles.Count} files including {scriptFiles[0].Name}..");
 
-            var result = await compiler.CompileSourceFilesAsync("ScriptContext", scriptFiles.Select(x => x.FullName), null, null, [.. Options.AdditionAssemblyNames], false);
+            var result = await compiler.CompileSourceFilesAsync("ScriptContext", scriptFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
             if (result.Success)
                 _logger.LogInformation($"Compilation success. assembly binary size {result.Binary.Length}. md5 hash is {result.Binary.GetMD5Hash().ToHexString()}.");
-            else result.Diagnostics.Each(diagnostic => _logger.LogError($"{diagnostic.ToString()}"));
+            else
+                result.Diagnostics.Each(diagnostic => _logger.LogError($"{diagnostic.ToString()}"));
             return result;
         }
-        public Task RunBinary(CompilerResult compilerResult)
+        public Task RunAssembly(CompilerResult compilerResult)
         {
             _logger.LogInformation($"Starting script.");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine();
-            Console.WriteLine("RUNNING START...");
-            Console.ResetColor();
+            Console.WriteLine(ConsoleHelper.WarpStringANSIColor("RUNNING START...", null, ConsoleColor.Green));
 
             return Task.Run(() =>
             {
-                var context = new AssemblyLoadContextEx("ScriptContextAssembly", true);
+                var context = new AssemblyLoadContextEx("ScriptContextAssembly", Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
                 using var codeStream = compilerResult.Binary.GetStream();
                 var assembly = context.LoadFromStream(codeStream);
 
-                Type = assembly.GetType(Options.MainTypeFullName);
-                Instance = Activator.CreateInstance(Type);
+                type = assembly.GetType(Options.StartTypeFullName);
+                instance = Activator.CreateInstance(type);
 
-                if (!Options.StartMethod.IsNullOrEmpty())
-                    Type.GetMethod(Options.StartMethod)?.Invoke(Instance, Options.StartMethodParameter);
+                Options.StartExecuteMethods.Each(method => type.Invoke(instance, method));
             });
         }
     }

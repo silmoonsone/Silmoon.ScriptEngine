@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AuthTradingScripts\AuthTradingScripts.csproj" />
     <ProjectReference Include="..\Silmoon.ScriptEngine\Silmoon.ScriptEngine.csproj" />
   </ItemGroup>
 

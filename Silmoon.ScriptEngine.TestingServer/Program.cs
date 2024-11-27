@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Silmoon.Runtime;
 using Silmoon.ScriptEngine.Services;
 
 var builder = Host.CreateApplicationBuilder();
@@ -14,18 +15,21 @@ builder.Services.Configure<EngineServiceOptions>(options =>
     options.ScriptFiles.Add(@"../../../../AuthTradingScripts/ScriptProgram.cs");
     options.ScriptFiles.Add(@"../../../../AuthTradingScripts/EAScript1.cs");
 
-    options.AdditionAssemblyNames.Add("System.Console");
-    options.AdditionAssemblyNames.Add("System.Runtime");
-    options.AdditionAssemblyNames.Add("System.Collections");
-    options.AdditionAssemblyNames.Add("System.Private.CoreLib");
-    options.AdditionAssemblyNames.Add("System.Linq");
-    options.AdditionAssemblyNames.Add("Silmoon.ScriptEngine");
-    options.AdditionAssemblyNames.Add("AutoTradingFrameworks");
+    options.ReferrerAssemblyPaths.Add(@"../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
 
-    options.MainTypeFullName = "AuthTradingScripts.ScriptProgram";
-    options.StartMethod = "StartScript";
-    options.StartMethodParameter = null;
-    options.StopMethod = "StopScript";
+    options.ReferrerAssemblyNames.Add("System.Console");
+    options.ReferrerAssemblyNames.Add("System.Runtime");
+    options.ReferrerAssemblyNames.Add("System.Collections");
+    options.ReferrerAssemblyNames.Add("System.Private.CoreLib");
+    options.ReferrerAssemblyNames.Add("System.Linq");
+    options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
+    //options.AdditionAssemblyNames.Add("AutoTradingFrameworks");
+
+    options.StartTypeFullName = "AuthTradingScripts.ScriptProgram";
+
+    options.StartExecuteMethods = [MethodExecuteInfo.Create("StartScript", null)];
+    options.StopExecuteMethods = [MethodExecuteInfo.Create("StopScript", null)];
+
 });
 
 var host = builder.Build();
