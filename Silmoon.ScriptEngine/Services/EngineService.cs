@@ -36,7 +36,7 @@ namespace Silmoon.ScriptEngine.Services
             HostApplicationLifetime.ApplicationStarted.Register(async () =>
             {
                 var fileInfos = CheckScriptFiles();
-                var complierResult = await CompilerScript(fileInfos);
+                var complierResult = await CompileScript(fileInfos);
                 if (complierResult.Success) _ = RunAssembly(complierResult);
                 else HostApplicationLifetime.StopApplication();
             });
@@ -79,7 +79,7 @@ namespace Silmoon.ScriptEngine.Services
             if (scriptFileIsNotExist) HostApplicationLifetime.StopApplication();
             return scriptFiles;
         }
-        public async Task<CompilerResult> CompilerScript(List<FileInfo> scriptFiles)
+        public async Task<CompilerResult> CompileScript(List<FileInfo> scriptFiles)
         {
             _logger.LogInformation($"Start compiling {scriptFiles.Count} files including {scriptFiles[0].Name}..");
 
