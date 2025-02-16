@@ -20,92 +20,49 @@ namespace Silmoon.ScriptEngine.Services
         EngineServiceOptions Options;
         IHostApplicationLifetime HostApplicationLifetime;
 
-        Compiler compiler = new Compiler();
-        object instance = null;
-        Type type = null;
+        EngineInstance EngineInstance { get; set; } = null;
 
         public EngineService(ILogger<EngineService> logger, IOptions<EngineServiceOptions> _options, IHostApplicationLifetime hostApplicationLifetime)
         {
             _logger = logger;
-            Options = _options.Value;
             HostApplicationLifetime = hostApplicationLifetime;
+            Options = _options.Value;
+            EngineInstance = new EngineInstance(Options);
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("EngineService started");
             HostApplicationLifetime.ApplicationStarted.Register(async () =>
             {
-                var fileInfos = CheckScriptFiles();
-                var complierResult = await CompileScript(fileInfos);
-                if (complierResult.Success) _ = RunAssembly(complierResult);
+                var fileInfos = EngineInstance.CheckScriptFiles();
+                if (fileInfos.State)
+                {
+                    var complierResult = await EngineInstance.CompileScript(fileInfos.Data);
+                    if (complierResult.Success)
+                    {
+                        EngineInstance.LoadAssembly(complierResult);
+                        Options.StartExecuteMethods.Each(method => EngineInstance.Type.Invoke(EngineInstance.Instance, method));
+                    }
+                    else HostApplicationLifetime.StopApplication();
+                }
                 else HostApplicationLifetime.StopApplication();
             });
             await Task.CompletedTask;
         }
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (instance is not null) await StopScript();
+            if (EngineInstance.Instance is not null) await StopScript();
 
             _logger.LogInformation("EngineService stopped");
             await Task.CompletedTask;
         }
         public async Task StopScript()
         {
-            Options.StopExecuteMethods.Each(method => type.Invoke(instance, method));
-
-            Console.WriteLine(ConsoleHelper.WarpStringANSIColor("RUNNING STOP...", null, ConsoleColor.Green));
-
+            Options.StopExecuteMethods.Each(method => EngineInstance.Type.Invoke(EngineInstance.Instance, method));
             _logger.LogInformation("Stopping script");
             await Task.CompletedTask;
         }
 
 
-        public List<FileInfo> CheckScriptFiles()
-        {
-            bool scriptFileIsNotExist = false;
-            List<FileInfo> scriptFiles = [];
-            Options.ScriptFiles.Each(file =>
-            {
-                var info = new FileInfo(file);
-                if (!info.Exists)
-                {
-                    scriptFileIsNotExist = true;
-                    _logger.LogError($"Script file {info.FullName} not found");
-                }
-                else
-                    scriptFiles.Add(info);
-            });
-
-            if (scriptFileIsNotExist) HostApplicationLifetime.StopApplication();
-            return scriptFiles;
-        }
-        public async Task<CompilerResult> CompileScript(List<FileInfo> scriptFiles)
-        {
-            _logger.LogInformation($"Start compiling {scriptFiles.Count} files including {scriptFiles[0].Name}..");
-
-            var result = await compiler.CompileSourceFilesAsync("ScriptContext", scriptFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
-            if (result.Success)
-                _logger.LogInformation($"Compilation success. assembly binary size {result.Binary.Length}. md5 hash is {result.Binary.GetMD5Hash().ToHexString()}.");
-            else
-                result.Diagnostics.Each(diagnostic => _logger.LogError($"{diagnostic.ToString()}"));
-            return result;
-        }
-        public Task RunAssembly(CompilerResult compilerResult)
-        {
-            _logger.LogInformation($"Starting script.");
-            Console.WriteLine(ConsoleHelper.WarpStringANSIColor("RUNNING START...", null, ConsoleColor.Green));
-
-            return Task.Run(() =>
-            {
-                var context = new AssemblyLoadContextEx("ScriptContextAssembly", Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
-                using var codeStream = compilerResult.Binary.GetStream();
-                var assembly = context.LoadFromStream(codeStream);
-
-                type = assembly.GetType(Options.StartTypeFullName);
-                instance = Activator.CreateInstance(type);
-
-                Options.StartExecuteMethods.Each(method => type.Invoke(instance, method));
-            });
-        }
     }
 }
