@@ -41,7 +41,7 @@ namespace Silmoon.ScriptEngine.Services
                     if (complierResult.Success)
                     {
                         EngineInstance.LoadAssembly(complierResult);
-                        Options.StartExecuteMethods.Each(method => EngineInstance.Type.Invoke(EngineInstance.Instance, method));
+                        EngineInstance.Type.Invoke(EngineInstance.Instance, Options.StartExecuteMethod);
                     }
                     else HostApplicationLifetime.StopApplication();
                 }
@@ -58,7 +58,7 @@ namespace Silmoon.ScriptEngine.Services
         }
         public async Task StopScript()
         {
-            Options.StopExecuteMethods.Each(method => EngineInstance.Type.Invoke(EngineInstance.Instance, method));
+            EngineInstance.Type.Invoke(EngineInstance.Instance, Options.StopExecuteMethod);
             _logger.LogInformation("Stopping script");
             await Task.CompletedTask;
         }

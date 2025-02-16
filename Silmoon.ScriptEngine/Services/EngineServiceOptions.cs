@@ -9,7 +9,7 @@ namespace Silmoon.ScriptEngine.Services
 {
     public class EngineServiceOptions : EngineInstanceOptions
     {
-        public MethodExecuteInfo[] StartExecuteMethods { get; set; } = [];
-        public MethodExecuteInfo[] StopExecuteMethods { get; set; } = [];
+        public MethodExecuteInfo StartExecuteMethod { get; set; } = null;
+        public MethodExecuteInfo StopExecuteMethod { get; set; } = null;
     }
 }

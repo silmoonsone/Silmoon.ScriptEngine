@@ -36,8 +36,8 @@ builder.Services.Configure<EngineServiceOptions>(options =>
 
     options.StartTypeFullName = "AuthTradingScripts.ScriptProgram";
 
-    options.StartExecuteMethods = [MethodExecuteInfo.Create("StartScript", null)];
-    options.StopExecuteMethods = [MethodExecuteInfo.Create("StopScript", null)];
+    options.StartExecuteMethod = MethodExecuteInfo.Create("StartScript", null);
+    options.StopExecuteMethod = MethodExecuteInfo.Create("StopScript", null);
 
 });
 

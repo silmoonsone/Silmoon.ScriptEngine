@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace Silmoon.ScriptEngine
 {
-    public class EngineInstance : IDisposable
+    public class EngineInstance<T> : IDisposable
     {
         public event EngineOutputCallback OnOutput;
         public event EngineErrorCallback OnError;
         Compiler Compiler { get; set; } = new Compiler();
         public AssemblyLoadContextEx Context { get; set; } = null;
-        EngineInstanceOptions EngineInstanceOptions { get; set; } = null;
-        public object Instance { get; set; } = null;
+        public EngineInstanceOptions EngineInstanceOptions { get; private set; } = null;
+        public T Instance { get; set; } = default;
         public Type Type { get; set; } = null;
 
         public EngineInstance()
@@ -64,17 +64,25 @@ namespace Silmoon.ScriptEngine
                 result.Diagnostics.Each(diagnostic => OnError?.Invoke($"{diagnostic.ToString()}"));
             return result;
         }
-        public void LoadAssembly(CompilerResult compilerResult)
+        public StateSet<bool> LoadAssembly(CompilerResult compilerResult)
         {
-            if (Context is not null) throw new InvalidOperationException("Context is not null. Please unload the assembly first.");
-            OnOutput?.Invoke($"Assembly({EngineInstanceOptions.AssemblyName}) loaded.");
-            Context = new AssemblyLoadContextEx(EngineInstanceOptions.AssemblyName, EngineInstanceOptions.ReferrerAssemblyNames, EngineInstanceOptions.ReferrerAssemblyPaths, true);
-            using var codeStream = compilerResult.Binary.GetStream();
-            var assembly = Context.LoadFromStream(codeStream);
+            if (Context is not null) return false.ToStateSet("Assembly context is not null, maybe has assembly is running.");
+            try
+            {
+                OnOutput?.Invoke($"Assembly({EngineInstanceOptions.AssemblyName}) loaded.");
+                Context = new AssemblyLoadContextEx(EngineInstanceOptions.AssemblyName, EngineInstanceOptions.ReferrerAssemblyNames, EngineInstanceOptions.ReferrerAssemblyPaths, true);
+                using var codeStream = compilerResult.Binary.GetStream();
+                var assembly = Context.LoadFromStream(codeStream);
 
-            Type = assembly.GetType(EngineInstanceOptions.StartTypeFullName);
-            Instance = Activator.CreateInstance(Type);
-            OnOutput?.Invoke($"Assembly({EngineInstanceOptions.AssemblyName}) running.");
+                Type = assembly.GetType(EngineInstanceOptions.StartTypeFullName);
+                Instance = (T)Activator.CreateInstance(Type);
+                OnOutput?.Invoke($"Assembly({EngineInstanceOptions.AssemblyName}) running.");
+                return true.ToStateSet();
+            }
+            catch (Exception ex)
+            {
+                return false.ToStateSet("Assembly load failed(" + ex.Message + ").");
+            }
         }
         public void UnloadAssembly()
         {
@@ -90,6 +98,12 @@ namespace Silmoon.ScriptEngine
         {
             try
             {
+                try
+                {
+                    if (Instance is IDisposable disposable)
+                        disposable.Dispose();
+                }
+                catch { }
                 UnloadAssembly();
             }
             catch { }
@@ -98,6 +112,15 @@ namespace Silmoon.ScriptEngine
                 OnOutput = null;
                 OnError = null;
             }
+        }
+    }
+    public class EngineInstance : EngineInstance<object>
+    {
+        public EngineInstance()
+        {
+        }
+        public EngineInstance(EngineInstanceOptions engineInstanceOptions) : base(engineInstanceOptions)
+        {
         }
     }
     public delegate void EngineOutputCallback(string message);
