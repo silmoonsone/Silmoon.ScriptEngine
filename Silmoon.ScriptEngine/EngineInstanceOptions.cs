@@ -14,6 +14,6 @@ namespace Silmoon.ScriptEngine
         public List<string> ReferrerAssemblyNames { get; set; } = [];
         public List<string> ReferrerAssemblyPaths { get; set; } = [];
 
-        public string StartTypeFullName { get; set; }
+        public string MainTypeFullName { get; set; }
     }
 }

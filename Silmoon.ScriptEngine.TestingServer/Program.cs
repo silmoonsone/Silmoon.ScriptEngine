@@ -34,7 +34,7 @@ builder.Services.Configure<EngineServiceOptions>(options =>
     //options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
     //options.AdditionAssemblyNames.Add("AutoTradingFrameworks");
 
-    options.StartTypeFullName = "AuthTradingScripts.ScriptProgram";
+    options.MainTypeFullName = "AuthTradingScripts.ScriptProgram";
 
     options.StartExecuteMethod = MethodExecuteInfo.Create("StartScript", null);
     options.StopExecuteMethod = MethodExecuteInfo.Create("StopScript", null);

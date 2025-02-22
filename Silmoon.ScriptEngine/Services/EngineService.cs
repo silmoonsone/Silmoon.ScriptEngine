@@ -56,6 +56,7 @@ namespace Silmoon.ScriptEngine.Services
                 {
                     _logger.LogInformation("Script compiled successfully");
                     EngineInstance.LoadAssembly(complierResult);
+                    EngineInstance.CreateInstance();
                     EngineInstance.Type.Invoke(EngineInstance.Instance, Options.StartExecuteMethod);
                 }
                 else

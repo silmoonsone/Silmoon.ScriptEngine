@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Silmoon.ScriptEngine
 {
-    public class EngineInstance<T> : IDisposable
+    public class EngineInstance<T> : IDisposable where T : class
     {
         public event EngineOutputCallback OnOutput;
         public event EngineErrorCallback OnError;
@@ -150,7 +150,7 @@ namespace Silmoon.ScriptEngine
             }
             else throw new Exception("Compiler result is not success.");
         }
-        public StateSet<bool> LoadCsjModel(CsjModel csjModel)
+        public StateSet<bool> LoadAssemblyFromCsjModel(CsjModel csjModel)
         {
             Options = csjModel.Options;
             return LoadAssembly(csjModel.CompilerResult);
@@ -161,11 +161,29 @@ namespace Silmoon.ScriptEngine
             var compressedData = csjModel.ToJsonString().GetBytes().Compress();
             return compressedData;
         }
-        public StateSet<bool> LoadCsjBinary(byte[] csjData)
+        public StateSet<bool> LoadAssemblyFromCsjBinary(byte[] csjData)
         {
             var json = csjData.Decompress().GetString();
             var csjModel = JsonConvert.DeserializeObject<CsjModel>(json);
-            return LoadCsjModel(csjModel);
+            return LoadAssemblyFromCsjModel(csjModel);
+        }
+
+        public StateSet<bool, Type> GetMainAssemblyType(CompilerResult compilerResult)
+        {
+            try
+            {
+                var context = new AssemblyLoadContextEx(Options.AssemblyName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
+                using var codeStream = compilerResult.Binary.GetStream();
+                var assembly = context.LoadFromStream(codeStream);
+
+                Type = assembly.GetType(Options.MainTypeFullName);
+                context.Unload();
+                return true.ToStateSet(Type);
+            }
+            catch (Exception ex)
+            {
+                return false.ToStateSet<Type>(null, "Assembly load failed(" + ex.Message + ").");
+            }
         }
         public StateSet<bool> LoadAssembly(CompilerResult compilerResult)
         {
@@ -177,8 +195,7 @@ namespace Silmoon.ScriptEngine
                 using var codeStream = compilerResult.Binary.GetStream();
                 var assembly = Context.LoadFromStream(codeStream);
 
-                Type = assembly.GetType(Options.StartTypeFullName);
-                Instance = (T)Activator.CreateInstance(Type);
+                Type = assembly.GetType(Options.MainTypeFullName);
                 OnOutput?.Invoke($"Assembly({Options.AssemblyName}) running.");
                 return true.ToStateSet();
             }
@@ -187,34 +204,42 @@ namespace Silmoon.ScriptEngine
                 return false.ToStateSet("Assembly load failed(" + ex.Message + ").");
             }
         }
+        public void CreateInstance()
+        {
+            if (Type is not null)
+            {
+                Instance = (T)Activator.CreateInstance(Type);
+                OnOutput?.Invoke($"Instance({Options.AssemblyName}) created.");
+            }
+
+        }
         public void UnloadAssembly()
         {
             if (Context is not null)
             {
-                Context.Unload();
-                Context = null;
-                OnOutput?.Invoke($"Assembly({Options.AssemblyName}) unloaded.");
+                try
+                {
+                    if (Instance is IDisposable disposable) disposable?.Dispose();
+                }
+                catch { }
+                finally
+                {
+                    Context.Unload();
+                    Context = null;
+                    OnOutput?.Invoke($"Assembly({Options.AssemblyName}) unloaded.");
+                }
             }
         }
 
         public void Dispose()
         {
-            try
-            {
-                try
-                {
-                    if (Instance is IDisposable disposable)
-                        disposable.Dispose();
-                }
-                catch { }
-                UnloadAssembly();
-            }
-            catch { }
-            finally
-            {
-                OnOutput = null;
-                OnError = null;
-            }
+            UnloadAssembly();
+            OnOutput = null;
+            OnError = null;
+            Context = null;
+            Options = null;
+            Instance = null;
+            Type = null;
         }
     }
     public class EngineInstance : EngineInstance<object>
