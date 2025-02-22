@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon", "..\Silmoon\Silmo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Extension", "..\Silmoon\Silmoon.Extension\Silmoon.Extension.csproj", "{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine.Cli", "Silmoon.ScriptEngine.Cli\Silmoon.ScriptEngine.Cli.csproj", "{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

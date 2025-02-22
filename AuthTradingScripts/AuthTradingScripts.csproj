@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="EAScript1.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AutoTradingFrameworks\AutoTradingFrameworks.csproj" />
   </ItemGroup>
 

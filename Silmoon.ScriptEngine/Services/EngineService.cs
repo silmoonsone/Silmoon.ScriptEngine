@@ -27,26 +27,11 @@ namespace Silmoon.ScriptEngine.Services
             _logger = logger;
             HostApplicationLifetime = hostApplicationLifetime;
             Options = _options.Value;
-            EngineInstance = new EngineInstance(Options);
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("EngineService started");
-            HostApplicationLifetime.ApplicationStarted.Register(async () =>
-            {
-                var fileInfos = EngineInstance.CheckScriptFiles();
-                if (fileInfos.State)
-                {
-                    var complierResult = await EngineInstance.CompileScript(fileInfos.Data);
-                    if (complierResult.Success)
-                    {
-                        EngineInstance.LoadAssembly(complierResult);
-                        EngineInstance.Type.Invoke(EngineInstance.Instance, Options.StartExecuteMethod);
-                    }
-                    else HostApplicationLifetime.StopApplication();
-                }
-                else HostApplicationLifetime.StopApplication();
-            });
+            HostApplicationLifetime.ApplicationStarted.Register(async () => await StartScript());
             await Task.CompletedTask;
         }
         public async Task StopAsync(CancellationToken cancellationToken)
@@ -56,9 +41,44 @@ namespace Silmoon.ScriptEngine.Services
             _logger.LogInformation("EngineService stopped");
             await Task.CompletedTask;
         }
+        async Task StartScript()
+        {
+            EngineInstance?.Dispose();
+            EngineInstance = new EngineInstance(Options);
+
+            EngineInstance.ProcessInstanceOptions();
+            var fileInfos = EngineInstance.CheckScriptFiles();
+            if (fileInfos.State)
+            {
+                _logger.LogInformation("Script files loaded successfully");
+                var complierResult = await EngineInstance.CompileScript(fileInfos.Data);
+                if (complierResult.Success)
+                {
+                    _logger.LogInformation("Script compiled successfully");
+                    EngineInstance.LoadAssembly(complierResult);
+                    EngineInstance.Type.Invoke(EngineInstance.Instance, Options.StartExecuteMethod);
+                }
+                else
+                {
+                    foreach (var item in complierResult.Diagnostics)
+                    {
+                        _logger.LogError(item.GetMessage());
+                    }
+                    _logger.LogError("Script compiled failed");
+                    HostApplicationLifetime.StopApplication();
+                }
+            }
+            else
+            {
+                _logger.LogError(fileInfos.Message);
+                HostApplicationLifetime.StopApplication();
+            }
+
+        }
         public async Task StopScript()
         {
             EngineInstance.Type.Invoke(EngineInstance.Instance, Options.StopExecuteMethod);
+            EngineInstance?.Dispose();
             _logger.LogInformation("Stopping script");
             await Task.CompletedTask;
         }

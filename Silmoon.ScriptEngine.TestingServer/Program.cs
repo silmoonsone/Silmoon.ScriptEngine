@@ -15,23 +15,23 @@ builder.Services.Configure<EngineServiceOptions>(options =>
     // if current working directory path include bin string:
     if (Directory.GetCurrentDirectory().Contains("bin"))
     {
-        options.ScriptFiles.Add(@"../../../../AuthTradingScripts/ScriptProgram.cs");
         options.ScriptFiles.Add(@"../../../../AuthTradingScripts/EAScript1.cs");
-        options.ReferrerAssemblyPaths.Add(@"../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
+        //options.ScriptFiles.Add(@"../../../../AuthTradingScripts/ScriptProgram.cs");
+        //options.ReferrerAssemblyPaths.Add(@"../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
     }
     else
     {
-        options.ScriptFiles.Add(@"../AuthTradingScripts/ScriptProgram.cs");
         options.ScriptFiles.Add(@"../AuthTradingScripts/EAScript1.cs");
-        options.ReferrerAssemblyPaths.Add(@"../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
+        //options.ScriptFiles.Add(@"../AuthTradingScripts/ScriptProgram.cs");
+        //options.ReferrerAssemblyPaths.Add(@"../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
     }
 
-    options.ReferrerAssemblyNames.Add("System.Console");
-    options.ReferrerAssemblyNames.Add("System.Runtime");
-    options.ReferrerAssemblyNames.Add("System.Collections");
-    options.ReferrerAssemblyNames.Add("System.Private.CoreLib");
-    options.ReferrerAssemblyNames.Add("System.Linq");
-    options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
+    //options.ReferrerAssemblyNames.Add("System.Console");
+    //options.ReferrerAssemblyNames.Add("System.Runtime");
+    //options.ReferrerAssemblyNames.Add("System.Collections");
+    //options.ReferrerAssemblyNames.Add("System.Private.CoreLib");
+    //options.ReferrerAssemblyNames.Add("System.Linq");
+    //options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
     //options.AdditionAssemblyNames.Add("AutoTradingFrameworks");
 
     options.StartTypeFullName = "AuthTradingScripts.ScriptProgram";
