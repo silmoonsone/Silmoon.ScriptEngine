@@ -63,7 +63,7 @@ internal class Program
         }
         Console.Write("OK");
         Console.WriteLine();
-        byte[] csjData = engine.GetCsjBinary(result);
+        byte[] csjData = engine.GetEngineExecuteModelBinary(result);
         File.WriteAllBytes(output, csjData);
         Console.WriteLine($"Output to {Path.GetFullPath(output)}");
     }

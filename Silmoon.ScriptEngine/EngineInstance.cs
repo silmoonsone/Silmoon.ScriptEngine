@@ -137,11 +137,11 @@ namespace Silmoon.ScriptEngine
         }
 
 
-        public CsjModel GetCsjModel(CompilerResult compilerResult)
+        public EngineExecuteModel GetEngineExecuteModel(CompilerResult compilerResult)
         {
             if (compilerResult.Success)
             {
-                CsjModel csjModel = new CsjModel()
+                EngineExecuteModel csjModel = new EngineExecuteModel()
                 {
                     CompilerResult = compilerResult,
                     Options = Options,
@@ -150,22 +150,22 @@ namespace Silmoon.ScriptEngine
             }
             else throw new Exception("Compiler result is not success.");
         }
-        public StateSet<bool> LoadAssemblyFromCsjModel(CsjModel csjModel)
+        public StateSet<bool> LoadEngineExecuteModel(EngineExecuteModel engineExecuteModel)
         {
-            Options = csjModel.Options;
-            return LoadAssembly(csjModel.CompilerResult);
+            Options = engineExecuteModel.Options;
+            return LoadAssembly(engineExecuteModel.CompilerResult);
         }
-        public byte[] GetCsjBinary(CompilerResult compilerResult)
+        public byte[] GetEngineExecuteModelBinary(CompilerResult compilerResult)
         {
-            var csjModel = GetCsjModel(compilerResult);
+            var csjModel = GetEngineExecuteModel(compilerResult);
             var compressedData = csjModel.ToJsonString().GetBytes().Compress();
             return compressedData;
         }
-        public StateSet<bool> LoadAssemblyFromCsjBinary(byte[] csjData)
+        public StateSet<bool> LoadEngineExecuteModelBinary(byte[] csjData)
         {
             var json = csjData.Decompress().GetString();
-            var csjModel = JsonConvert.DeserializeObject<CsjModel>(json);
-            return LoadAssemblyFromCsjModel(csjModel);
+            var csjModel = JsonConvert.DeserializeObject<EngineExecuteModel>(json);
+            return LoadEngineExecuteModel(csjModel);
         }
 
         public StateSet<bool, Type> GetMainAssemblyType(CompilerResult compilerResult)

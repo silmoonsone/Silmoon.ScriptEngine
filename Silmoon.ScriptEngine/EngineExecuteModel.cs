@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Silmoon.ScriptEngine
 {
-    public class CsjModel
+    public class EngineExecuteModel
     {
         public EngineInstanceOptions Options { get; set; }
         public CompilerResult CompilerResult { get; set; }
