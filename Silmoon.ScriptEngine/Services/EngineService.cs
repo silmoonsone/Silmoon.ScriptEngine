@@ -51,11 +51,11 @@ namespace Silmoon.ScriptEngine.Services
             if (fileInfos.State)
             {
                 _logger.LogInformation("Script files loaded successfully");
-                var complierResult = await EngineInstance.CompileScript(fileInfos.Data);
+                var complierResult = await EngineInstance.CompileScript();
                 if (complierResult.Success)
                 {
                     _logger.LogInformation("Script compiled successfully");
-                    EngineInstance.LoadAssembly(complierResult);
+                    EngineInstance.LoadAssembly();
                     EngineInstance.CreateInstance();
                     EngineInstance.Type.Invoke(EngineInstance.Instance, Options.StartExecuteMethod);
                 }

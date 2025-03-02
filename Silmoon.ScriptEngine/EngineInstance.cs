@@ -24,6 +24,9 @@ namespace Silmoon.ScriptEngine
         public T Instance { get; set; } = default;
         public Type Type { get; set; } = null;
 
+        public List<FileInfo> CheckedFiles { get; private set; } = [];
+        public CompilerResult CompilerResult { get; private set; } = null;
+
         public EngineInstance()
         {
             Options = new EngineInstanceOptions();
@@ -122,81 +125,39 @@ namespace Silmoon.ScriptEngine
             if (scriptFileIsNotExist)
                 return false.ToStateSet(scriptFiles, "Some script file(s) do not exist.");
             else
+            {
+                CheckedFiles = scriptFiles;
                 return true.ToStateSet(scriptFiles);
+            }
         }
-        public async Task<CompilerResult> CompileScript(List<FileInfo> scriptFiles)
+        public async Task<CompilerResult> CompileScript()
         {
-            OnOutput?.Invoke($"Start compiling {scriptFiles.Count} files including {scriptFiles[0].Name}..");
+            OnOutput?.Invoke($"Start compiling {CheckedFiles.Count} files including {CheckedFiles[0].Name}..");
 
-            var result = await Compiler.CompileSourceFilesAsync("ScriptContext", scriptFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
+            var result = await Compiler.CompileSourceFilesAsync("ScriptContext", CheckedFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
             if (result.Success)
+            {
+                CompilerResult = result;
                 OnOutput?.Invoke($"Compilation success. assembly binary size {result.Binary.Length}. md5 hash is {result.Binary.GetMD5Hash().ToHexString()}.");
+            }
             else
-                result.Diagnostics.Each(diagnostic => OnError?.Invoke($"{diagnostic.ToString()}"));
+                result.Diagnostics.Each(diagnostic => OnError?.Invoke($"{diagnostic}"));
             return result;
         }
 
 
-        public EngineExecuteModel GetEngineExecuteModel(CompilerResult compilerResult)
-        {
-            if (compilerResult.Success)
-            {
-                EngineExecuteModel csjModel = new EngineExecuteModel()
-                {
-                    CompilerResult = compilerResult,
-                    Options = Options,
-                };
-                return csjModel;
-            }
-            else throw new Exception("Compiler result is not success.");
-        }
-        public StateSet<bool> LoadEngineExecuteModel(EngineExecuteModel engineExecuteModel)
-        {
-            Options = engineExecuteModel.Options;
-            return LoadAssembly(engineExecuteModel.CompilerResult);
-        }
-        public byte[] GetEngineExecuteModelBinary(CompilerResult compilerResult)
-        {
-            var csjModel = GetEngineExecuteModel(compilerResult);
-            var compressedData = csjModel.ToJsonString().GetBytes().Compress();
-            return compressedData;
-        }
-        public StateSet<bool> LoadEngineExecuteModelBinary(byte[] csjData)
-        {
-            var json = csjData.Decompress().GetString();
-            var csjModel = JsonConvert.DeserializeObject<EngineExecuteModel>(json);
-            return LoadEngineExecuteModel(csjModel);
-        }
-
-        public StateSet<bool, Type> GetMainAssemblyType(CompilerResult compilerResult)
-        {
-            try
-            {
-                var context = new AssemblyLoadContextEx(Options.AssemblyName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
-                using var codeStream = compilerResult.Binary.GetStream();
-                var assembly = context.LoadFromStream(codeStream);
-
-                Type = assembly.GetType(Options.MainTypeFullName);
-                context.Unload();
-                return true.ToStateSet(Type);
-            }
-            catch (Exception ex)
-            {
-                return false.ToStateSet<Type>(null, "Assembly load failed(" + ex.Message + ").");
-            }
-        }
-        public StateSet<bool> LoadAssembly(CompilerResult compilerResult)
+        public StateSet<bool> LoadAssembly()
         {
             if (Context is not null) return false.ToStateSet("Assembly context is not null, maybe has assembly is running.");
             try
             {
                 OnOutput?.Invoke($"Assembly({Options.AssemblyName}) loaded.");
                 Context = new AssemblyLoadContextEx(Options.AssemblyName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
-                using var codeStream = compilerResult.Binary.GetStream();
+                using var codeStream = CompilerResult.Binary.GetStream();
                 var assembly = Context.LoadFromStream(codeStream);
 
                 Type = assembly.GetType(Options.MainTypeFullName);
-                OnOutput?.Invoke($"Assembly({Options.AssemblyName}) running.");
+                OnOutput?.Invoke($"Get main type({Type.FullName}) ok.");
                 return true.ToStateSet();
             }
             catch (Exception ex)
@@ -209,7 +170,7 @@ namespace Silmoon.ScriptEngine
             if (Type is not null)
             {
                 Instance = (T)Activator.CreateInstance(Type);
-                OnOutput?.Invoke($"Instance({Options.AssemblyName}) created.");
+                OnOutput?.Invoke($"Instance({Options.AssemblyName}::{Type.FullName}) created.");
             }
 
         }
@@ -230,7 +191,54 @@ namespace Silmoon.ScriptEngine
                 }
             }
         }
+        public StateSet<bool, Type> GetMainAssemblyType(CompilerResult compilerResult)
+        {
+            try
+            {
+                var context = new AssemblyLoadContextEx(Options.AssemblyName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
+                using var codeStream = compilerResult.Binary.GetStream();
+                var assembly = context.LoadFromStream(codeStream);
 
+                Type = assembly.GetType(Options.MainTypeFullName);
+                context.Unload();
+                return true.ToStateSet(Type);
+            }
+            catch (Exception ex)
+            {
+                return false.ToStateSet<Type>(null, "Assembly load failed(" + ex.Message + ").");
+            }
+        }
+
+        public EngineExecuteModel GetEngineExecuteModel(CompilerResult compilerResult)
+        {
+            if (compilerResult.Success)
+            {
+                EngineExecuteModel csjModel = new EngineExecuteModel()
+                {
+                    CompilerResult = compilerResult,
+                    Options = Options,
+                };
+                return csjModel;
+            }
+            else throw new Exception("Compiler result is not success.");
+        }
+        public StateSet<bool> LoadEngineExecuteModel(EngineExecuteModel engineExecuteModel)
+        {
+            Options = engineExecuteModel.Options;
+            return LoadAssembly();
+        }
+        public byte[] GetEngineExecuteModelBinary(CompilerResult compilerResult)
+        {
+            var csjModel = GetEngineExecuteModel(compilerResult);
+            var compressedData = csjModel.ToJsonString().GetBytes().Compress();
+            return compressedData;
+        }
+        public StateSet<bool> LoadEngineExecuteModelBinary(byte[] csjData)
+        {
+            var json = csjData.Decompress().GetString();
+            var csjModel = JsonConvert.DeserializeObject<EngineExecuteModel>(json);
+            return LoadEngineExecuteModel(csjModel);
+        }
         public void Dispose()
         {
             UnloadAssembly();
