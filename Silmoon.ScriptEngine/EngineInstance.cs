@@ -9,6 +9,7 @@ using Silmoon.Secure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,14 +19,14 @@ namespace Silmoon.ScriptEngine
     {
         public event EngineOutputCallback OnOutput;
         public event EngineErrorCallback OnError;
+        public EngineInstanceOptions Options { get; private set; } = null;
         Compiler Compiler { get; set; } = new Compiler();
         public AssemblyLoadContextEx Context { get; set; } = null;
-        public EngineInstanceOptions Options { get; private set; } = null;
+        public Assembly InstanceAssembly { get; set; } = null;
         public T Instance { get; set; } = default;
         public Type Type { get; set; } = null;
 
         public List<FileInfo> CheckedFiles { get; private set; } = [];
-        //public CompilerResult CompilerResult { get; private set; } = null;
         public byte[] AssemblyBinary { get; private set; } = null;
 
 
@@ -38,77 +39,7 @@ namespace Silmoon.ScriptEngine
             Options = engineInstanceOptions;
         }
 
-        public EngineInstanceOptions ProcessInstanceOptions()
-        {
-            for (int i = 0; i < Options.ScriptFiles.Count; i++)
-            {
-                Options.ScriptFiles[i] = Path.GetFullPath(Options.ScriptFiles[i]);
-            }
-            for (int i = 0; i < Options.ReferrerAssemblyPaths.Count; i++)
-            {
-                Options.ReferrerAssemblyPaths[i] = Path.GetFullPath(Options.ReferrerAssemblyPaths[i]);
-            }
-
-            List<string> files = [];
-            List<string> refs = [];
-            foreach (var item in Options.ScriptFiles)
-            {
-                string[] lines = File.ReadAllLines(item);
-                foreach (var line in lines)
-                {
-                    if (line.StartsWith("//dep:"))
-                    {
-                        var lineArray = line.Split(":");
-                        if (lineArray.Length == 2)
-                        {
-                            if (!Options.ReferrerAssemblyNames.Contains(lineArray[1])) Options.ReferrerAssemblyNames.Add(lineArray[1]);
-                        }
-                    }
-
-                    if (line.StartsWith("//ref:"))
-                    {
-                        var lineArray = line.Split(":");
-                        if (lineArray.Length == 2)
-                        {
-                            refs.Add(Path.GetFullPath(lineArray[1]));
-                        }
-                    }
-
-                    if (line.StartsWith("//csf:"))
-                    {
-                        var lineArray = line.Split(":");
-                        if (lineArray.Length == 2)
-                        {
-                            files.Add(Path.GetFullPath(lineArray[1]));
-                        }
-                    }
-                }
-            }
-
-            List<string> refs2 = [];
-            foreach (var item in refs)
-            {
-                if (!Options.ReferrerAssemblyPaths.Contains(item)) refs2.Add(item);
-            }
-
-            List<string> files2 = [];
-            foreach (var item in files)
-            {
-                if (!Options.ScriptFiles.Contains(item)) files2.Add(item);
-            }
-
-            foreach (var item in refs2)
-            {
-                Options.ReferrerAssemblyPaths.Add(item);
-            }
-            foreach (var item in files2)
-            {
-                Options.ScriptFiles.Add(item);
-            }
-
-            return Options;
-        }
-        public StateSet<bool, List<FileInfo>> CheckScriptFiles()
+        public StateSet<bool, List<FileInfo>> CheckFiles()
         {
             bool scriptFileIsNotExist = false;
             List<FileInfo> scriptFiles = [];
@@ -132,11 +63,77 @@ namespace Silmoon.ScriptEngine
                 return true.ToStateSet(scriptFiles);
             }
         }
-        public async Task<CompilerResult> CompileScript()
+        public EngineInstanceOptions Preprocess()
+        {
+            for (int i = 0; i < Options.ScriptFiles.Count; i++)
+            {
+                Options.ScriptFiles[i] = Path.GetFullPath(Options.ScriptFiles[i]);
+            }
+            for (int i = 0; i < Options.ReferrerAssemblyPaths.Count; i++)
+            {
+                Options.ReferrerAssemblyPaths[i] = Path.GetFullPath(Options.ReferrerAssemblyPaths[i]);
+            }
+
+            List<string> files = [];
+            string assemblyName = Options.AssemblyName;
+            foreach (var item in Options.ScriptFiles)
+            {
+                string[] lines = File.ReadAllLines(item);
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("//dep:"))
+                    {
+                        var lineArray = line.Split(":");
+                        if (lineArray.Length == 2)
+                        {
+                            if (!Options.ReferrerAssemblyNames.Contains(lineArray[1].Trim())) Options.ReferrerAssemblyNames.Add(lineArray[1].Trim());
+                        }
+                    }
+
+                    if (line.StartsWith("//ref:"))
+                    {
+                        var lineArray = line.Split(":");
+                        if (lineArray.Length == 2)
+                        {
+                            var path = Path.GetFullPath(lineArray[1].Trim());
+                            if (!Options.ReferrerAssemblyPaths.Contains(path)) Options.ReferrerAssemblyPaths.Add(path);
+                        }
+                    }
+
+                    if (line.StartsWith("//csf:"))
+                    {
+                        var lineArray = line.Split(":");
+                        if (lineArray.Length == 2)
+                        {
+                            files.Add(Path.GetFullPath(lineArray[1].Trim()));
+                        }
+                    }
+
+                    if (line.StartsWith("//assemblyName:"))
+                    {
+                        var lineArray = line.Split(":");
+                        if (lineArray.Length == 2)
+                        {
+                            assemblyName = lineArray[1].Trim();
+                        }
+                    }
+                }
+            }
+
+            Options.AssemblyName = assemblyName;
+
+            foreach (var item in files)
+            {
+                if (!Options.ScriptFiles.Contains(item)) Options.ScriptFiles.Add(item);
+            }
+
+            return Options;
+        }
+        public async Task<CompilerResult> Compile()
         {
             OnOutput?.Invoke($"Start compiling {CheckedFiles.Count} files including {CheckedFiles[0].Name}..");
 
-            var result = await Compiler.CompileSourceFilesAsync("ScriptContext", CheckedFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
+            var result = await Compiler.CompileSourceFilesAsync(Options.AssemblyName, CheckedFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
             if (result.Success)
             {
                 AssemblyBinary = result.Binary;
@@ -153,14 +150,22 @@ namespace Silmoon.ScriptEngine
             if (Context is not null) return false.ToStateSet("Assembly context is not null, maybe has assembly is running.");
             try
             {
-                OnOutput?.Invoke($"Assembly({Options.AssemblyName}) loaded.");
-                Context = new AssemblyLoadContextEx(Options.AssemblyName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
+                Context = new AssemblyLoadContextEx(Options.AssemblyLoadContextName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
                 using var codeStream = AssemblyBinary.GetStream();
-                var assembly = Context.LoadFromStream(codeStream);
+                InstanceAssembly = Context.LoadFromStream(codeStream);
+                OnOutput?.Invoke($"AssemblyLoadContext{(Context.Name.IsNullOrEmpty() ? "(unname!)" : $"({Context.Name})")}, Assembly({InstanceAssembly.GetName().Name}) loaded.");
 
-                Type = assembly.GetType(Options.MainTypeFullName);
-                OnOutput?.Invoke($"Get main type({Type.FullName}) ok.");
-                return true.ToStateSet();
+                Type = InstanceAssembly.GetType(Options.MainTypeFullName);
+                if (Type is null)
+                {
+                    OnError?.Invoke("Main type is null. Check main type name.");
+                    return false.ToStateSet("Main type is null. Check main type name.");
+                }
+                else
+                {
+                    OnOutput?.Invoke($"Get main type({Type.FullName}) ok.");
+                    return true.ToStateSet();
+                }
             }
             catch (Exception ex)
             {
@@ -172,9 +177,8 @@ namespace Silmoon.ScriptEngine
             if (Type is not null)
             {
                 Instance = (T)Activator.CreateInstance(Type);
-                OnOutput?.Invoke($"Instance({Options.AssemblyName}::{Type.FullName}) created.");
+                OnOutput?.Invoke($"Instance({InstanceAssembly.GetName().Name}::{Type.FullName}){(Options.AssemblyLoadContextName.IsNullOrEmpty() ? string.Empty : $" created on {Options.AssemblyLoadContextName}")}.");
             }
-
         }
         public void UnloadAssembly()
         {
@@ -184,7 +188,6 @@ namespace Silmoon.ScriptEngine
                 {
                     if (Instance is IDisposable disposable) disposable?.Dispose();
                 }
-                catch { }
                 finally
                 {
                     Context.Unload();
@@ -192,23 +195,9 @@ namespace Silmoon.ScriptEngine
                     OnOutput?.Invoke($"Assembly({Options.AssemblyName}) unloaded.");
                 }
             }
-        }
-        public StateSet<bool, Type> GetMainAssemblyType(CompilerResult compilerResult)
-        {
-            try
-            {
-                var context = new AssemblyLoadContextEx(Options.AssemblyName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
-                using var codeStream = compilerResult.Binary.GetStream();
-                var assembly = context.LoadFromStream(codeStream);
-
-                Type = assembly.GetType(Options.MainTypeFullName);
-                context.Unload();
-                return true.ToStateSet(Type);
-            }
-            catch (Exception ex)
-            {
-                return false.ToStateSet<Type>(null, "Assembly load failed(" + ex.Message + ").");
-            }
+            Instance = null;
+            InstanceAssembly = null;
+            Type = null;
         }
 
 
@@ -248,12 +237,9 @@ namespace Silmoon.ScriptEngine
         public void Dispose()
         {
             UnloadAssembly();
+            Options = null;
             OnOutput = null;
             OnError = null;
-            Context = null;
-            Options = null;
-            Instance = null;
-            Type = null;
         }
     }
     public class EngineInstance : EngineInstance<object>

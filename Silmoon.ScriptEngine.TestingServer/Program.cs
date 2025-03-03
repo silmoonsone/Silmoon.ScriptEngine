@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Silmoon.Runtime;
 using Silmoon.ScriptEngine.Services;
+using Silmoon.Secure;
 
 var builder = Host.CreateApplicationBuilder();
 
@@ -34,7 +35,10 @@ builder.Services.Configure<EngineServiceOptions>(options =>
     //options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
     //options.AdditionAssemblyNames.Add("AutoTradingFrameworks");
 
+    //options.MainTypeFullName = "AuthTradingScripts.ScriptProgram";
+    options.AssemblyLoadContextName = HashHelper.RandomChars(8, true, false, false);
     options.MainTypeFullName = "AuthTradingScripts.ScriptProgram";
+    options.AssemblyName = "ScriptAssembly";
 
     options.StartExecuteMethod = MethodExecuteInfo.Create("StartScript", null);
     options.StopExecuteMethod = MethodExecuteInfo.Create("StopScript", null);

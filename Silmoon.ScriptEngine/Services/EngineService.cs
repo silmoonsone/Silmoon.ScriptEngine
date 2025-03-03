@@ -45,13 +45,14 @@ namespace Silmoon.ScriptEngine.Services
         {
             EngineInstance?.Dispose();
             EngineInstance = new EngineInstance(Options);
-
-            EngineInstance.ProcessInstanceOptions();
-            var fileInfos = EngineInstance.CheckScriptFiles();
+            EngineInstance.OnOutput += (s) => _logger.LogInformation(s);
+            EngineInstance.OnError += (s, e) => _logger.LogError(s);
+            EngineInstance.Preprocess();
+            var fileInfos = EngineInstance.CheckFiles();
             if (fileInfos.State)
             {
                 _logger.LogInformation("Script files loaded successfully");
-                var complierResult = await EngineInstance.CompileScript();
+                var complierResult = await EngineInstance.Compile();
                 if (complierResult.Success)
                 {
                     _logger.LogInformation("Script compiled successfully");

@@ -1,12 +1,12 @@
-﻿//ref: ../../../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll
+﻿//assemblyName: EAScriptTestAssembly_ScriptProgram
+//ref: ../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll
 //dep: System.Console
 //dep: System.Runtime
 //dep: System.Collections
 //dep: System.Private.CoreLib
 //dep: System.Linq
 //dep: Silmoon.ScriptEngine
-//csf: ../../../../../../AuthTradingScripts/ScriptProgram.cs
-
+//csf: ../../../../AuthTradingScripts/ScriptProgram.cs
 
 using System;
 using AutoTradingFrameworks;

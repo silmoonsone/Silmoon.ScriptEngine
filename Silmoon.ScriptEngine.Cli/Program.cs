@@ -39,9 +39,9 @@ internal class Program
         {
             ScriptFiles = [file],
         });
-        engine.ProcessInstanceOptions();
+        engine.Preprocess();
         Console.Write("Checking...");
-        var files = engine.CheckScriptFiles();
+        var files = engine.CheckFiles();
         if (!files.State)
         {
             Console.Write(files.Message);
@@ -50,7 +50,7 @@ internal class Program
         Console.Write("OK");
         Console.WriteLine();
         Console.Write("Compiling...");
-        var result = await engine.CompileScript();
+        var result = await engine.Compile();
         if (!result.Success)
         {
             Console.Write("Failed");
