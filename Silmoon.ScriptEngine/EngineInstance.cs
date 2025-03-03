@@ -25,7 +25,9 @@ namespace Silmoon.ScriptEngine
         public Type Type { get; set; } = null;
 
         public List<FileInfo> CheckedFiles { get; private set; } = [];
-        public CompilerResult CompilerResult { get; private set; } = null;
+        //public CompilerResult CompilerResult { get; private set; } = null;
+        public byte[] AssemblyBinary { get; private set; } = null;
+
 
         public EngineInstance()
         {
@@ -137,7 +139,7 @@ namespace Silmoon.ScriptEngine
             var result = await Compiler.CompileSourceFilesAsync("ScriptContext", CheckedFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
             if (result.Success)
             {
-                CompilerResult = result;
+                AssemblyBinary = result.Binary;
                 OnOutput?.Invoke($"Compilation success. assembly binary size {result.Binary.Length}. md5 hash is {result.Binary.GetMD5Hash().ToHexString()}.");
             }
             else
@@ -153,7 +155,7 @@ namespace Silmoon.ScriptEngine
             {
                 OnOutput?.Invoke($"Assembly({Options.AssemblyName}) loaded.");
                 Context = new AssemblyLoadContextEx(Options.AssemblyName, Options.ReferrerAssemblyNames, Options.ReferrerAssemblyPaths, true);
-                using var codeStream = CompilerResult.Binary.GetStream();
+                using var codeStream = AssemblyBinary.GetStream();
                 var assembly = Context.LoadFromStream(codeStream);
 
                 Type = assembly.GetType(Options.MainTypeFullName);
@@ -209,13 +211,14 @@ namespace Silmoon.ScriptEngine
             }
         }
 
+
         public EngineExecuteModel GetEngineExecuteModel(CompilerResult compilerResult)
         {
             if (compilerResult.Success)
             {
                 EngineExecuteModel csjModel = new EngineExecuteModel()
                 {
-                    CompilerResult = compilerResult,
+                    AssemblyBinary = compilerResult.Binary,
                     Options = Options,
                 };
                 return csjModel;
@@ -225,6 +228,7 @@ namespace Silmoon.ScriptEngine
         public StateSet<bool> LoadEngineExecuteModel(EngineExecuteModel engineExecuteModel)
         {
             Options = engineExecuteModel.Options;
+            AssemblyBinary = engineExecuteModel.AssemblyBinary;
             return LoadAssembly();
         }
         public byte[] GetEngineExecuteModelBinary(CompilerResult compilerResult)
@@ -239,6 +243,8 @@ namespace Silmoon.ScriptEngine
             var csjModel = JsonConvert.DeserializeObject<EngineExecuteModel>(json);
             return LoadEngineExecuteModel(csjModel);
         }
+
+
         public void Dispose()
         {
             UnloadAssembly();

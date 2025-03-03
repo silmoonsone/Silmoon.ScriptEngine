@@ -10,6 +10,6 @@ namespace Silmoon.ScriptEngine
     public class EngineExecuteModel
     {
         public EngineInstanceOptions Options { get; set; }
-        public CompilerResult CompilerResult { get; set; }
+        public byte[] AssemblyBinary { get; set; }
     }
 }

@@ -50,7 +50,7 @@ internal class Program
         Console.Write("OK");
         Console.WriteLine();
         Console.Write("Compiling...");
-        var result = await engine.CompileScript(files.Data);
+        var result = await engine.CompileScript();
         if (!result.Success)
         {
             Console.Write("Failed");
