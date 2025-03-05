@@ -39,30 +39,6 @@ namespace Silmoon.ScriptEngine
             Options = engineInstanceOptions;
         }
 
-        public StateSet<bool, List<FileInfo>> CheckFiles()
-        {
-            bool scriptFileIsNotExist = false;
-            List<FileInfo> scriptFiles = [];
-            Options.ScriptFiles.Each(file =>
-            {
-                var info = new FileInfo(file);
-                if (!info.Exists)
-                {
-                    scriptFileIsNotExist = true;
-                    OnError?.Invoke($"Script file {info.FullName} not found");
-                }
-                else
-                    scriptFiles.Add(info);
-            });
-
-            if (scriptFileIsNotExist)
-                return false.ToStateSet(scriptFiles, "Some script file(s) do not exist.");
-            else
-            {
-                CheckedFiles = scriptFiles;
-                return true.ToStateSet(scriptFiles);
-            }
-        }
         public EngineInstanceOptions Preprocess()
         {
             for (int i = 0; i < Options.ScriptFiles.Count; i++)
@@ -78,6 +54,7 @@ namespace Silmoon.ScriptEngine
             string assemblyName = Options.AssemblyName;
             foreach (var item in Options.ScriptFiles)
             {
+                if (!File.Exists(item)) continue;
                 string[] lines = File.ReadAllLines(item);
                 foreach (var line in lines)
                 {
@@ -128,6 +105,30 @@ namespace Silmoon.ScriptEngine
             }
 
             return Options;
+        }
+        public StateSet<bool, List<FileInfo>> CheckFiles()
+        {
+            bool scriptFileIsNotExist = false;
+            List<FileInfo> scriptFiles = [];
+            Options.ScriptFiles.Each(file =>
+            {
+                var info = new FileInfo(file);
+                if (!info.Exists)
+                {
+                    scriptFileIsNotExist = true;
+                    OnError?.Invoke($"Script file {info.FullName} not found");
+                }
+                else
+                    scriptFiles.Add(info);
+            });
+
+            if (scriptFileIsNotExist)
+                return false.ToStateSet(scriptFiles, "Some script file(s) do not exist.");
+            else
+            {
+                CheckedFiles = scriptFiles;
+                return true.ToStateSet(scriptFiles);
+            }
         }
         public async Task<CompilerResult> Compile()
         {
