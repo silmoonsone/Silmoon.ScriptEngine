@@ -16,5 +16,16 @@ namespace Silmoon.ScriptEngine
         public List<string> ReferrerAssemblyPaths { get; set; } = [];
 
         public string MainTypeFullName { get; set; }
+
+
+        public void AddCoreReferrer()
+        {
+            ReferrerAssemblyNames.Add("netstandard");
+            ReferrerAssemblyNames.Add("System.Console");
+            ReferrerAssemblyNames.Add("System.Runtime");
+            ReferrerAssemblyNames.Add("System.Collections");
+            ReferrerAssemblyNames.Add("System.Private.CoreLib");
+            ReferrerAssemblyNames.Add("System.Linq");
+        }
     }
 }

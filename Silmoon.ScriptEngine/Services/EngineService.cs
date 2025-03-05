@@ -84,7 +84,5 @@ namespace Silmoon.ScriptEngine.Services
             _logger.LogInformation("Stopping script");
             await Task.CompletedTask;
         }
-
-
     }
 }

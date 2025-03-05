@@ -58,41 +58,33 @@ namespace Silmoon.ScriptEngine
                 string[] lines = File.ReadAllLines(item);
                 foreach (var line in lines)
                 {
-                    if (line.StartsWith("//dep:"))
+                    if (line.StartsWith("#pragma dep"))
                     {
-                        var lineArray = line.Split(":");
-                        if (lineArray.Length == 2)
-                        {
-                            if (!Options.ReferrerAssemblyNames.Contains(lineArray[1].Trim())) Options.ReferrerAssemblyNames.Add(lineArray[1].Trim());
-                        }
+                        var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (lineArray.Length == 3)
+                            if (!Options.ReferrerAssemblyNames.Contains(lineArray[2].Trim())) Options.ReferrerAssemblyNames.Add(lineArray[2].Trim());
                     }
 
-                    if (line.StartsWith("//ref:"))
+                    if (line.StartsWith("#pragma ref"))
                     {
-                        var lineArray = line.Split(":");
-                        if (lineArray.Length == 2)
+                        var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (lineArray.Length == 3)
                         {
-                            var path = Path.GetFullPath(lineArray[1].Trim());
+                            var path = Path.GetFullPath(lineArray[2].Trim());
                             if (!Options.ReferrerAssemblyPaths.Contains(path)) Options.ReferrerAssemblyPaths.Add(path);
                         }
                     }
 
-                    if (line.StartsWith("//csf:"))
+                    if (line.StartsWith("#pragma csf"))
                     {
-                        var lineArray = line.Split(":");
-                        if (lineArray.Length == 2)
-                        {
-                            files.Add(Path.GetFullPath(lineArray[1].Trim()));
-                        }
+                        var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (lineArray.Length == 3) files.Add(Path.GetFullPath(lineArray[2].Trim()));
                     }
 
-                    if (line.StartsWith("//assemblyName:"))
+                    if (line.StartsWith("#pragma assemblyName"))
                     {
-                        var lineArray = line.Split(":");
-                        if (lineArray.Length == 2)
-                        {
-                            assemblyName = lineArray[1].Trim();
-                        }
+                        var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (lineArray.Length == 3) assemblyName = lineArray[2].Trim();
                     }
                 }
             }
