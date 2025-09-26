@@ -2,6 +2,7 @@
 using Silmoon;
 using Silmoon.Extension;
 using Silmoon.ScriptEngine;
+using Silmoon.ScriptEngine.Options;
 using System.Threading.Tasks;
 
 internal class Program
@@ -35,7 +36,7 @@ internal class Program
         var output = Args.GetParameter("--output");
         //var file = "I:\\Git\\GitHub\\silmoonsone\\Silmoon.ScriptEngine\\AuthTradingScripts\\EAScript1.cs";
         //var output = ".\\bin.csj";
-        using var engine = new EngineInstance(new EngineInstanceOptions()
+        var engine = new EngineCompiler(new EngineCompilerOptions()
         {
             ScriptFiles = [file],
         });

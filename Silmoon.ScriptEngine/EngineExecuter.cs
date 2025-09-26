@@ -1,0 +1,103 @@
+﻿using Newtonsoft.Json;
+using Silmoon.Extension;
+using Silmoon.Models;
+using Silmoon.Runtime;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Silmoon.ScriptEngine
+{
+    public class EngineExecuter<T> : IDisposable where T : class
+    {
+        public event EngineOutputCallback OnOutput;
+        public event EngineErrorCallback OnError;
+
+        public AssemblyLoadContextEx Context { get; set; } = null;
+        public Assembly InstanceAssembly { get; set; } = null;
+        public T Instance { get; set; } = default;
+        public Type Type { get; set; } = null;
+        EngineExecuteContext EngineExecuteContext { get; set; } = null;
+
+        public EngineExecuter(EngineExecuteContext engineExecuteModel)
+        {
+            EngineExecuteContext = engineExecuteModel;
+        }
+        public EngineExecuter(byte[] engineExecuteModelBytes)
+        {
+            var jsonString = engineExecuteModelBytes.Decompress().GetString();
+            var engineExecuteModel = JsonConvert.DeserializeObject<EngineExecuteContext>(jsonString);
+            EngineExecuteContext = engineExecuteModel;
+        }
+
+        public StateSet<bool> LoadAssembly()
+        {
+            if (Context is not null) return false.ToStateSet("Assembly context is not null, maybe has assembly is running.");
+            try
+            {
+                Context = new AssemblyLoadContextEx(EngineExecuteContext.Options.AssemblyLoadContextName, EngineExecuteContext.Options.ReferrerAssemblyNames, EngineExecuteContext.Options.ReferrerAssemblyPaths, true);
+                if (EngineExecuteContext.AssemblyBinary is null)
+                    InstanceAssembly = Context.LoadFromAssemblyName(new AssemblyName(EngineExecuteContext.Options.AssemblyName));
+                else
+                {
+                    using var codeStream = EngineExecuteContext.AssemblyBinary.GetStream();
+                    InstanceAssembly = Context.LoadFromStream(codeStream);
+                }
+
+                OnOutput?.Invoke($"AssemblyLoadContext{(Context.Name.IsNullOrEmpty() ? "(unname!)" : $"({Context.Name})")}, Assembly({InstanceAssembly.GetName().Name}) loaded.");
+
+                Type = InstanceAssembly.GetType(EngineExecuteContext.Options.EntryTypeFullName);
+                if (Type is null)
+                {
+                    OnError?.Invoke("Main type is null. Check main type name.");
+                    return false.ToStateSet("Main type is null. Check main type name.");
+                }
+                else
+                {
+                    OnOutput?.Invoke($"Get main type({Type.FullName}) ok.");
+                    return true.ToStateSet();
+                }
+            }
+            catch (Exception ex)
+            {
+                return false.ToStateSet("Assembly load failed(" + ex.Message + ").");
+            }
+        }
+        public void CreateInstance()
+        {
+            if (Type is not null)
+            {
+                Instance = (T)Activator.CreateInstance(Type);
+                OnOutput?.Invoke($"Instance({InstanceAssembly.GetName().Name}::{Type.FullName}){(EngineExecuteContext.Options.AssemblyLoadContextName.IsNullOrEmpty() ? string.Empty : $" created on {EngineExecuteContext.Options.AssemblyLoadContextName}")}.");
+            }
+        }
+        public void UnloadAssembly()
+        {
+            if (Context is not null)
+            {
+                try
+                {
+                    if (Instance is IDisposable disposable) disposable?.Dispose();
+                }
+                finally
+                {
+                    Context.Unload();
+                    Context = null;
+                    OnOutput?.Invoke($"Assembly({EngineExecuteContext.Options.AssemblyName}) unloaded.");
+                }
+            }
+            Instance = null;
+            InstanceAssembly = null;
+            Type = null;
+        }
+        public void Dispose()
+        {
+            UnloadAssembly();
+            OnOutput = null;
+            OnError = null;
+        }
+    }
+}

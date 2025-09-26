@@ -1,21 +1,19 @@
-﻿using Silmoon.Runtime;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Silmoon.ScriptEngine
+namespace Silmoon.ScriptEngine.Options
 {
-    public class EngineInstanceOptions
+    public class EngineOptions
     {
         public string AssemblyName { get; set; } = null;
         public string AssemblyLoadContextName { get; set; } = null;
-        public List<string> ScriptFiles { get; set; } = [];
         public List<string> ReferrerAssemblyNames { get; set; } = [];
         public List<string> ReferrerAssemblyPaths { get; set; } = [];
 
-        public string MainTypeFullName { get; set; }
+        public string EntryTypeFullName { get; set; }
 
 
         public void AddCoreReferrer()

@@ -3,7 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Silmoon.Runtime;
-using Silmoon.ScriptEngine.Services;
+using Silmoon.ScriptEngine.ServiceHostTesting;
 using Silmoon.Secure;
 
 var builder = Host.CreateApplicationBuilder();
@@ -16,29 +16,29 @@ builder.Services.Configure<EngineServiceOptions>(options =>
     // if current working directory path include bin string:
     if (Directory.GetCurrentDirectory().Contains("bin"))
     {
-        options.ScriptFiles.Add(@"../../../../AuthTradingScripts/EAScript1.cs");
-        //options.ScriptFiles.Add(@"../../../../AuthTradingScripts/ScriptProgram.cs");
+        options.ScriptFiles.Add(@"../../../../AutoTradingScripts/EAScript1.cs");
+
+        //options.ScriptFiles.Add(@"../../../../AutoTradingScripts/ScriptProgram.cs");
         //options.ReferrerAssemblyPaths.Add(@"../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
     }
     else
     {
-        options.ScriptFiles.Add(@"../AuthTradingScripts/EAScript1.cs");
-        //options.ScriptFiles.Add(@"../AuthTradingScripts/ScriptProgram.cs");
+        options.ScriptFiles.Add(@"../AutoTradingScripts/EAScript1.cs");
+
+        //options.ScriptFiles.Add(@"../AutoTradingScripts/ScriptProgram.cs");
         //options.ReferrerAssemblyPaths.Add(@"../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
     }
 
-    //options.ReferrerAssemblyNames.Add("System.Console");
-    //options.ReferrerAssemblyNames.Add("System.Runtime");
-    //options.ReferrerAssemblyNames.Add("System.Collections");
-    //options.ReferrerAssemblyNames.Add("System.Private.CoreLib");
-    //options.ReferrerAssemblyNames.Add("System.Linq");
-    //options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
-    //options.AdditionAssemblyNames.Add("AutoTradingFrameworks");
+    options.AddCoreReferrer();
+    options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
+    options.ReferrerAssemblyPaths.Add("../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll");
 
-    //options.MainTypeFullName = "AuthTradingScripts.ScriptProgram";
+    //options.MainTypeFullName = "AutoTradingScripts.ScriptProgram";
     options.AssemblyLoadContextName = HashHelper.RandomChars(8, true, false, false);
-    options.MainTypeFullName = "AuthTradingScripts.ScriptProgram";
+    options.EntryTypeFullName = "AutoTradingScripts.ScriptProgram";
     options.AssemblyName = "ScriptAssembly";
+
+    //options.ReferrerAssemblyPaths.Add(@"C:\Users\silmoon\Desktop\test.dll");
 
     options.StartExecuteMethod = MethodExecuteInfo.Create("StartScript", null);
     options.StopExecuteMethod = MethodExecuteInfo.Create("StopScript", null);

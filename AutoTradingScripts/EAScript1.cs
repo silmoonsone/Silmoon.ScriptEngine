@@ -6,12 +6,12 @@
 #pragma dep System.Private.CoreLib
 #pragma dep System.Linq
 #pragma dep Silmoon.ScriptEngine
-#pragma csf ../../../../AuthTradingScripts/ScriptProgram.cs
+#pragma csf ../../../../AutoTradingScripts/ScriptProgram.cs
 
 using System;
 using AutoTradingFrameworks;
 
-namespace AuthTradingScripts
+namespace AutoTradingScripts
 {
     public class EAScript1 : AutoTradingScript
     {

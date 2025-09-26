@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine", "Sil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{CD2DD9B2-53A1-4F71-8624-E0E05937BE73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine.TestingServer", "Silmoon.ScriptEngine.TestingServer\Silmoon.ScriptEngine.TestingServer.csproj", "{0624426E-754B-43EE-A6AB-FEF87EB9D549}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine.ServiceHostTesting", "Silmoon.ScriptEngine.ServiceHostTesting\Silmoon.ScriptEngine.ServiceHostTesting.csproj", "{0624426E-754B-43EE-A6AB-FEF87EB9D549}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "支持框架", "支持框架", "{3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}"
 EndProject
@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决�
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTradingFrameworks", "AutoTradingFrameworks\AutoTradingFrameworks.csproj", "{58939C28-9CB3-4FF6-BD90-325696FC7C16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthTradingScripts", "AuthTradingScripts\AuthTradingScripts.csproj", "{C67EA20F-F56B-45BE-B486-73EC30665443}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTradingScripts", "AutoTradingScripts\AutoTradingScripts.csproj", "{C67EA20F-F56B-45BE-B486-73EC30665443}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Runtime", "..\Silmoon\Silmoon.Runtime\Silmoon.Runtime.csproj", "{E26F5359-0E32-46DC-87ED-1A4C1C479A8C}"
 EndProject
@@ -80,5 +80,8 @@ Global
 		{E26F5359-0E32-46DC-87ED-1A4C1C479A8C} = {3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}
 		{4473A233-0E3A-4960-85AF-04F5A62B822F} = {3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}
 		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4} = {3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D69BD22F-BE34-4549-ACC6-9FE4041F1431}
 	EndGlobalSection
 EndGlobal
