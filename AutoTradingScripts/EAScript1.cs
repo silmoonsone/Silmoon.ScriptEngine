@@ -1,5 +1,5 @@
 ﻿//assemblyName: EAScriptTestAssembly_ScriptProgram
-#pragma ref ../../../../AutoTradingFrameworks/bin/Debug/net8.0/AutoTradingFrameworks.dll
+#pragma ref ../../../../AutoTradingFrameworks/bin/Debug/net9.0/AutoTradingFrameworks.dll
 #pragma dep System.Console
 #pragma dep System.Runtime
 #pragma dep System.Collections

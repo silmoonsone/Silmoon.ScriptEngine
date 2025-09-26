@@ -1,6 +1,7 @@
 ﻿using Silmoon.Extension;
 using Silmoon.Models;
 using Silmoon.Runtime;
+using Silmoon.ScriptEngine.Models;
 using Silmoon.ScriptEngine.Options;
 using Silmoon.Secure;
 using System;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Silmoon.ScriptEngine
+namespace Silmoon.ScriptEngine.Models
 {
     public class EngineExecuteContext
     {

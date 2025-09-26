@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoTradingFrameworks;
 
 namespace Silmoon.ScriptEngine.ServiceHostTesting
 {
@@ -35,7 +36,7 @@ namespace Silmoon.ScriptEngine.ServiceHostTesting
             {
                 EngineCompiler = new EngineCompiler(Options);
                 EngineCompiler.OnOutput += (s) => _logger.LogInformation(s);
-                EngineCompiler.OnError += (s, e) => _logger.LogError(s);
+                EngineCompiler.OnError += (s, e) => _logger.LogError(e, s);
                 EngineCompiler.Preprocess();
                 var fileInfos = EngineCompiler.CheckFiles();
                 if (fileInfos.State)
@@ -47,6 +48,8 @@ namespace Silmoon.ScriptEngine.ServiceHostTesting
                         _logger.LogInformation("Script compiled successfully");
 
                         EngineExecuter = EngineCompiler.NewExecuter<object>();
+                        EngineExecuter.OnOutput += (s) => _logger.LogInformation(s);
+                        EngineExecuter.OnError += (s, e) => _logger.LogError(e, s);
                         EngineExecuter.LoadAssembly();
                         EngineExecuter.CreateInstance();
                         EngineExecuter.Type.Invoke(EngineExecuter.Instance, Options.StartExecuteMethod);

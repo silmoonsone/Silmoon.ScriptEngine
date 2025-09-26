@@ -1,13 +1,14 @@
-﻿using System;
-using System.Threading;
+﻿using AutoTradingFrameworks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AutoTradingScripts
 {
-    public class ScriptProgram
+    public class ScriptProgram : IScriptProgram
     {
         EAScript1 script;
 
