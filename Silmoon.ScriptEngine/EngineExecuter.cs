@@ -101,4 +101,13 @@ namespace Silmoon.ScriptEngine
             OnError = null;
         }
     }
+    public class EngineExecuter : EngineExecuter<object>
+    {
+        public EngineExecuter(EngineExecuteContext engineExecuteModel) : base(engineExecuteModel)
+        {
+        }
+        public EngineExecuter(byte[] engineExecuteModelBytes) : base(engineExecuteModelBytes)
+        {
+        }
+    }
 }

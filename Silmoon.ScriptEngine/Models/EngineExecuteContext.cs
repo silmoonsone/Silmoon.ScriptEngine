@@ -1,4 +1,5 @@
-﻿using Silmoon.ScriptEngine.Options;
+﻿using Silmoon.Extension;
+using Silmoon.ScriptEngine.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,10 @@ namespace Silmoon.ScriptEngine.Models
     {
         public EngineOptions Options { get; set; }
         public byte[] AssemblyBinary { get; set; }
+        public byte[] GetEngineExecuteModelBinary()
+        {
+            var compressedData = this.ToJsonString().GetBytes().Compress();
+            return compressedData;
+        }
     }
 }

@@ -134,6 +134,14 @@ namespace Silmoon.ScriptEngine
             }
         }
 
+        public EngineExecuter NewExecuter()
+        {
+            return new EngineExecuter(new EngineExecuteContext()
+            {
+                AssemblyBinary = AssemblyBinary,
+                Options = Options,
+            });
+        }
         public EngineExecuter<T> NewExecuter<T>() where T : class
         {
             return new EngineExecuter<T>(new EngineExecuteContext()
@@ -141,32 +149,6 @@ namespace Silmoon.ScriptEngine
                 AssemblyBinary = AssemblyBinary,
                 Options = Options,
             });
-        }
-
-
-        public EngineExecuteContext GetEngineExecuteModel(CompilerResult compilerResult)
-        {
-            if (compilerResult.Success)
-            {
-                EngineExecuteContext engineExecuteContext = new EngineExecuteContext()
-                {
-                    AssemblyBinary = compilerResult.Binary,
-                    Options = Options,
-                };
-                return engineExecuteContext;
-            }
-            else throw new Exception("Compiler result is not success.");
-        }
-        public byte[] GetEngineExecuteModelBinary(EngineExecuteContext engineExecuteContext)
-        {
-            var compressedData = engineExecuteContext.ToJsonString().GetBytes().Compress();
-            return compressedData;
-        }
-        public byte[] GetEngineExecuteModelBinary(CompilerResult compilerResult)
-        {
-            var engineExecuteContext = GetEngineExecuteModel(compilerResult);
-            var compressedData = engineExecuteContext.ToJsonString().GetBytes().Compress();
-            return compressedData;
         }
     }
     public delegate void EngineOutputCallback(string message);

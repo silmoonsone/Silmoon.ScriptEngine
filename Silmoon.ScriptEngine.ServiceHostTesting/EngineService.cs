@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoTradingFrameworks;
+using Silmoon.ScriptEngine.Models;
+using Silmoon.ScriptEngine.Extensions;
 
 namespace Silmoon.ScriptEngine.ServiceHostTesting
 {
@@ -22,7 +24,7 @@ namespace Silmoon.ScriptEngine.ServiceHostTesting
         IHostApplicationLifetime HostApplicationLifetime;
 
         EngineCompiler EngineCompiler { get; set; } = null;
-        EngineExecuter<object> EngineExecuter { get; set; } = null;
+        EngineExecuter EngineExecuter { get; set; } = null;
         public EngineService(ILogger<EngineService> logger, IOptions<EngineServiceOptions> _options, IHostApplicationLifetime hostApplicationLifetime)
         {
             _logger = logger;
@@ -47,7 +49,17 @@ namespace Silmoon.ScriptEngine.ServiceHostTesting
                     {
                         _logger.LogInformation("Script compiled successfully");
 
-                        EngineExecuter = EngineCompiler.NewExecuter<object>();
+                        EngineExecuter = EngineCompiler.NewExecuter();
+
+                        //File.WriteAllBytes(@"C:\Users\silmoon\Desktop\test.dll", complierResult.Binary);
+                        //File.WriteAllBytes(@"C:\Users\silmoon\Desktop\test.csj", complierResult.GetEngineExecuteModelBinary(Options));
+
+                        //EngineExecuteContext engineExecuteContext = complierResult.GetEngineExecuteModel(Options);
+                        //engineExecuteContext.AssemblyBinary = File.ReadAllBytes(@"C:\Users\silmoon\Desktop\test.dll");
+
+                        //var csjData = File.ReadAllBytes(@"C:\Users\silmoon\Desktop\test.csj");
+                        //EngineExecuter = new EngineExecuter(csjData);
+
                         EngineExecuter.OnOutput += (s) => _logger.LogInformation(s);
                         EngineExecuter.OnError += (s, e) => _logger.LogError(e, s);
                         EngineExecuter.LoadAssembly();

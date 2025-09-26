@@ -2,6 +2,7 @@
 using Silmoon;
 using Silmoon.Extension;
 using Silmoon.ScriptEngine;
+using Silmoon.ScriptEngine.Extensions;
 using Silmoon.ScriptEngine.Options;
 using System.Threading.Tasks;
 
@@ -64,7 +65,7 @@ internal class Program
         }
         Console.Write("OK");
         Console.WriteLine();
-        byte[] csjData = engine.GetEngineExecuteModelBinary(result);
+        byte[] csjData = result.GetEngineExecuteModelBinary(engine.Options);
         File.WriteAllBytes(output, csjData);
         Console.WriteLine($"Output to {Path.GetFullPath(output)}");
     }
