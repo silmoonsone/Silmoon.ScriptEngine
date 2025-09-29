@@ -2,6 +2,7 @@
 using Silmoon.Extension;
 using Silmoon.Models;
 using Silmoon.Runtime;
+using Silmoon.Runtime.Extensions;
 using Silmoon.ScriptEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Silmoon.ScriptEngine
         public Assembly InstanceAssembly { get; set; } = null;
         public T Instance { get; set; } = default;
         public Type Type { get; set; } = null;
-        EngineExecuteContext EngineExecuteContext { get; set; } = null;
+        public EngineExecuteContext EngineExecuteContext { get; private set; } = null;
 
         public EngineExecuter(EngineExecuteContext engineExecuteModel)
         {
@@ -40,25 +41,20 @@ namespace Silmoon.ScriptEngine
             try
             {
                 Context = new AssemblyLoadContextEx(EngineExecuteContext.Options.AssemblyLoadContextName, EngineExecuteContext.Options.ReferrerAssemblyNames, EngineExecuteContext.Options.ReferrerAssemblyPaths, true);
-                if (EngineExecuteContext.AssemblyBinary is null)
-                    InstanceAssembly = Context.LoadFromAssemblyName(new AssemblyName(EngineExecuteContext.Options.AssemblyName));
-                else
-                {
-                    using var codeStream = EngineExecuteContext.AssemblyBinary.GetStream();
-                    InstanceAssembly = Context.LoadFromStream(codeStream);
-                }
+                using var codeStream = EngineExecuteContext.AssemblyBinary.GetStream();
+                InstanceAssembly = Context.LoadFromStream(codeStream);
+                Type = InstanceAssembly.GetType(EngineExecuteContext.Options.EntryTypeFullName);
 
                 OnOutput?.Invoke($"AssemblyLoadContext{(Context.Name.IsNullOrEmpty() ? "(unname!)" : $"({Context.Name})")}, Assembly({InstanceAssembly.GetName().Name}) loaded.");
 
-                Type = InstanceAssembly.GetType(EngineExecuteContext.Options.EntryTypeFullName);
                 if (Type is null)
                 {
-                    OnError?.Invoke("Main type is null. Check main type name.");
-                    return false.ToStateSet("Main type is null. Check main type name.");
+                    OnError?.Invoke("Entry type is null. Check entry type name.");
+                    return false.ToStateSet("Entry type is null. Check entry type name.");
                 }
                 else
                 {
-                    OnOutput?.Invoke($"Get main type({Type.FullName}) ok.");
+                    OnOutput?.Invoke($"Get entry type({Type.FullName}) ok.");
                     return true.ToStateSet();
                 }
             }
@@ -87,13 +83,16 @@ namespace Silmoon.ScriptEngine
                 {
                     Context.Unload();
                     Context = null;
-                    OnOutput?.Invoke($"Assembly({EngineExecuteContext.Options.AssemblyName}) unloaded.");
+                    OnOutput?.Invoke($"Assembly({InstanceAssembly.GetName().Name}) unloaded.");
                 }
             }
             Instance = null;
             InstanceAssembly = null;
             Type = null;
         }
+
+
+
         public void Dispose()
         {
             UnloadAssembly();

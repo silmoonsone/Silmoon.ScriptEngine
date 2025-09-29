@@ -39,46 +39,50 @@ namespace Silmoon.ScriptEngine.ServiceHostTesting
                 EngineCompiler = new EngineCompiler(Options);
                 EngineCompiler.OnOutput += (s) => _logger.LogInformation(s);
                 EngineCompiler.OnError += (s, e) => _logger.LogError(e, s);
-                EngineCompiler.Preprocess();
-                var fileInfos = EngineCompiler.CheckFiles();
-                if (fileInfos.State)
+                //EngineCompiler.Preprocess();
+                //var fileInfos = EngineCompiler.CheckFiles();
+                //if (!fileInfos.State)
+                //{
+                //    _logger.LogError(fileInfos.Message);
+                //    HostApplicationLifetime.StopApplication();
+                //    return;
+                //}
+                //_logger.LogInformation("Script files loaded successfully");
+
+
+                var complierResult = await EngineCompiler.Compile();
+                if (complierResult.State && complierResult.Data.Success)
                 {
-                    _logger.LogInformation("Script files loaded successfully");
-                    var complierResult = await EngineCompiler.Compile();
-                    if (complierResult.Success)
-                    {
-                        _logger.LogInformation("Script compiled successfully");
+                    _logger.LogInformation("Script compiled successfully");
 
-                        EngineExecuter = EngineCompiler.NewExecuter();
+                    //File.WriteAllBytes(@"C:\Users\silmoon\Desktop\test.dll", complierResult.Binary);
+                    //File.WriteAllBytes(@"C:\Users\silmoon\Desktop\test.csj", complierResult.GetEngineExecuteModelBinary(Options));
 
-                        //File.WriteAllBytes(@"C:\Users\silmoon\Desktop\test.dll", complierResult.Binary);
-                        //File.WriteAllBytes(@"C:\Users\silmoon\Desktop\test.csj", complierResult.GetEngineExecuteModelBinary(Options));
 
-                        //EngineExecuteContext engineExecuteContext = complierResult.GetEngineExecuteModel(Options);
-                        //engineExecuteContext.AssemblyBinary = File.ReadAllBytes(@"C:\Users\silmoon\Desktop\test.dll");
+                    EngineExecuter = new EngineExecuter(complierResult.Data.GetEngineExecuteModel(EngineCompiler.Options));
 
-                        //var csjData = File.ReadAllBytes(@"C:\Users\silmoon\Desktop\test.csj");
-                        //EngineExecuter = new EngineExecuter(csjData);
 
-                        EngineExecuter.OnOutput += (s) => _logger.LogInformation(s);
-                        EngineExecuter.OnError += (s, e) => _logger.LogError(e, s);
-                        EngineExecuter.LoadAssembly();
-                        EngineExecuter.CreateInstance();
-                        EngineExecuter.Type.Invoke(EngineExecuter.Instance, Options.StartExecuteMethod);
-                    }
-                    else
-                    {
-                        foreach (var item in complierResult.Diagnostics)
-                        {
-                            _logger.LogError(item.GetMessage());
-                        }
-                        _logger.LogError("Script compiled failed");
-                        HostApplicationLifetime.StopApplication();
-                    }
+                    //EngineExecuteContext engineExecuteContext = complierResult.Data.GetEngineExecuteModel(Options);
+                    //engineExecuteContext.AssemblyBinary = File.ReadAllBytes(@"C:\Users\silmoon\Desktop\test.dll");
+                    //EngineExecuter = new EngineExecuter(engineExecuteContext);
+
+
+                    //var csjData = File.ReadAllBytes(@"C:\Users\silmoon\Desktop\test.csj");
+                    //EngineExecuter = new EngineExecuter(csjData);
+
+                    EngineExecuter.OnOutput += (s) => _logger.LogInformation(s);
+                    EngineExecuter.OnError += (s, e) => _logger.LogError(e, s);
+                    EngineExecuter.LoadAssembly();
+                    EngineExecuter.CreateInstance();
+                    EngineExecuter.Type.Invoke(EngineExecuter.Instance, Options.StartExecuteMethod);
                 }
                 else
                 {
-                    _logger.LogError(fileInfos.Message);
+                    foreach (var item in complierResult.Data.Diagnostics)
+                    {
+                        _logger.LogError(item.GetMessage());
+                    }
+                    _logger.LogError("Script compiled failed");
                     HostApplicationLifetime.StopApplication();
                 }
             });

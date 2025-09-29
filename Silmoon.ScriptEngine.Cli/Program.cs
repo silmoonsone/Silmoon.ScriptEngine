@@ -41,23 +41,23 @@ internal class Program
         {
             ScriptFiles = [file],
         });
-        engine.Preprocess();
-        Console.Write("Checking...");
-        var files = engine.CheckFiles();
-        if (!files.State)
-        {
-            Console.Write(files.Message);
-            return;
-        }
-        Console.Write("OK");
-        Console.WriteLine();
-        Console.Write("Compiling...");
+        //engine.Preprocess();
+        //Console.Write("Checking...");
+        //var files = engine.CheckFiles();
+        //if (!files.State)
+        //{
+        //    Console.Write(files.Message);
+        //    return;
+        //}
+        //Console.Write("OK");
+        //Console.WriteLine();
+        //Console.Write("Compiling...");
         var result = await engine.Compile();
-        if (!result.Success)
+        if (!result.State && result.Data.Success)
         {
             Console.Write("Failed");
             Console.WriteLine();
-            foreach (var item in result.Diagnostics)
+            foreach (var item in result.Data.Diagnostics)
             {
                 Console.WriteLine(item.GetMessage());
             }
@@ -65,7 +65,7 @@ internal class Program
         }
         Console.Write("OK");
         Console.WriteLine();
-        byte[] csjData = result.GetEngineExecuteModelBinary(engine.Options);
+        byte[] csjData = result.Data.GetEngineExecuteModelBinary(engine.Options);
         File.WriteAllBytes(output, csjData);
         Console.WriteLine($"Output to {Path.GetFullPath(output)}");
     }

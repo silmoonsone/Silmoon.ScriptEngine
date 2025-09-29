@@ -8,7 +8,6 @@ namespace Silmoon.ScriptEngine.Options
 {
     public class EngineOptions
     {
-        public string AssemblyName { get; set; } = null;
         public string AssemblyLoadContextName { get; set; } = null;
         public List<string> ReferrerAssemblyNames { get; set; } = [];
         public List<string> ReferrerAssemblyPaths { get; set; } = [];

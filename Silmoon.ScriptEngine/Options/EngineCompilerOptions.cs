@@ -8,6 +8,8 @@ namespace Silmoon.ScriptEngine.Options
 {
     public class EngineCompilerOptions : EngineOptions
     {
+        public string AssemblyName { get; set; } = null;
+
         public List<string> ScriptFiles { get; set; } = [];
     }
 }

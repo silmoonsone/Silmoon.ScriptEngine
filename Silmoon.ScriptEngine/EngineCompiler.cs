@@ -17,19 +17,16 @@ namespace Silmoon.ScriptEngine
     {
         public event EngineOutputCallback OnOutput;
         public event EngineErrorCallback OnError;
-        public EngineCompilerOptions Options { get; private set; } = null;
-        Compiler Compiler { get; set; } = new Compiler();
-
-        public List<FileInfo> CheckedFiles { get; private set; } = [];
+        public EngineCompilerOptions Options { get; private set; }
+        Compiler Compiler = new Compiler();
         public byte[] AssemblyBinary { get; private set; } = null;
-
 
         public EngineCompiler(EngineCompilerOptions engineInstanceOptions)
         {
             Options = engineInstanceOptions;
         }
 
-        public EngineOptions Preprocess()
+        EngineOptions Preprocess()
         {
             for (int i = 0; i < Options.ScriptFiles.Count; i++)
             {
@@ -88,7 +85,7 @@ namespace Silmoon.ScriptEngine
 
             return Options;
         }
-        public StateSet<bool, List<FileInfo>> CheckFiles()
+        StateSet<bool, List<FileInfo>> CheckFiles()
         {
             bool scriptFileIsNotExist = false;
             List<FileInfo> scriptFiles = [];
@@ -108,46 +105,45 @@ namespace Silmoon.ScriptEngine
                 return false.ToStateSet(scriptFiles, "Some script file(s) do not exist.");
             else
             {
-                CheckedFiles = scriptFiles;
                 return true.ToStateSet(scriptFiles);
             }
         }
-        public async Task<CompilerResult> Compile()
+        public async Task<StateSet<bool, CompilerResult>> Compile()
         {
-            if (!CheckedFiles.IsNullOrEmpty())
+            Preprocess();
+            var checkResult = CheckFiles();
+            if (checkResult.State)
             {
-                if (!CheckedFiles.IsNullOrEmpty()) OnOutput?.Invoke($"Start compiling {CheckedFiles.Count} files including {CheckedFiles[0].Name}..");
-
-                var result = await Compiler.CompileSourceFilesAsync(Options.AssemblyName, CheckedFiles.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
-                if (result.Success)
+                if (!checkResult.Data.IsNullOrEmpty())
                 {
-                    AssemblyBinary = result.Binary;
-                    OnOutput?.Invoke($"Compilation success. assembly binary size {result.Binary.Length}. md5 hash is {result.Binary.GetMD5Hash().ToHexString()}.");
+                    if (!checkResult.Data.IsNullOrEmpty()) OnOutput?.Invoke($"Start compiling {checkResult.Data.Count} files including {checkResult.Data[0].Name}..");
+                    var result = await Compiler.CompileSourceFilesAsync(Options.AssemblyName, checkResult.Data.Select(x => x.FullName), null, [.. Options.ReferrerAssemblyPaths], [.. Options.ReferrerAssemblyNames], false);
+                    if (result.Success)
+                        OnOutput?.Invoke($"Compilation success. assembly binary size {result.Binary.Length}. md5 hash is {result.Binary.GetMD5Hash().ToHexString()}.");
+                    else
+                        result.Diagnostics.Each(diagnostic => OnError?.Invoke($"{diagnostic}"));
+                    return result.Success.ToStateSet(result);
                 }
                 else
-                    result.Diagnostics.Each(diagnostic => OnError?.Invoke($"{diagnostic}"));
-                return result;
+                    return false.ToStateSet<CompilerResult>(null, "No script files to compile. Please check files.");
             }
-            else
-            {
-                throw new FileLoadException("No script files to compile. Please check files.");
-            }
+            else return false.ToStateSet<CompilerResult>(null, checkResult.Message);
         }
 
-        public EngineExecuter NewExecuter()
+        public EngineExecuter GetEngineExecuter(byte[] assemblyBinary, EngineCompilerOptions options)
         {
             return new EngineExecuter(new EngineExecuteContext()
             {
-                AssemblyBinary = AssemblyBinary,
-                Options = Options,
+                AssemblyBinary = assemblyBinary,
+                Options = options,
             });
         }
-        public EngineExecuter<T> NewExecuter<T>() where T : class
+        public EngineExecuter<T> GetEngineExecuter<T>(byte[] assemblyBinary, EngineCompilerOptions options) where T : class
         {
             return new EngineExecuter<T>(new EngineExecuteContext()
             {
-                AssemblyBinary = AssemblyBinary,
-                Options = Options,
+                AssemblyBinary = assemblyBinary,
+                Options = options,
             });
         }
     }
