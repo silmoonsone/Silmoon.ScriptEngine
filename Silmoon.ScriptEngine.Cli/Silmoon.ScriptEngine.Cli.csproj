@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Silmoon" Version="2.0.2" />
+    <PackageReference Include="Silmoon" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
