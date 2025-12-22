@@ -31,7 +31,7 @@ builder.Services.Configure<EngineServiceOptions>(options =>
 
     options.AddCoreReferrer();
     options.ReferrerAssemblyNames.Add("Silmoon.ScriptEngine");
-    options.ReferrerAssemblyPaths.Add("../../../../AutoTradingFrameworks/bin/Debug/net9.0/AutoTradingFrameworks.dll");
+    //options.ReferrerAssemblyPaths.Add("../../../../AutoTradingFrameworks/bin/Debug/net9.0/AutoTradingFrameworks.dll");
 
     options.AssemblyLoadContextName = HashHelper.RandomChars(8, true, false, false);
     options.EntryTypeFullName = "AutoTradingScripts.ScriptProgram";

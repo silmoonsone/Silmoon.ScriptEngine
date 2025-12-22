@@ -44,33 +44,36 @@ namespace Silmoon.ScriptEngine
                 string[] lines = File.ReadAllLines(item);
                 foreach (var line in lines)
                 {
-                    if (line.StartsWith("#pragma dep"))
+                    if (line.StartsWith("#pragma d"))
                     {
                         var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        if (lineArray.Length == 3)
-                            if (!Options.ReferrerAssemblyNames.Contains(lineArray[2].Trim())) Options.ReferrerAssemblyNames.Add(lineArray[2].Trim());
+                        if (lineArray.Length == 3 && lineArray[2].StartsWith('"') && lineArray[2].EndsWith('"'))
+                            if (!Options.ReferrerAssemblyNames.Contains(lineArray[2].Trim('"')))
+                                Options.ReferrerAssemblyNames.Add(lineArray[2].Trim());
                     }
 
-                    if (line.StartsWith("#pragma ref"))
+                    if (line.StartsWith("#pragma r"))
                     {
                         var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        if (lineArray.Length == 3)
+                        if (lineArray.Length == 3 && lineArray[2].StartsWith('"') && lineArray[2].EndsWith('"'))
                         {
-                            var path = Path.GetFullPath(lineArray[2].Trim());
+                            var path = Path.GetFullPath(lineArray[2].Trim('"'));
                             if (!Options.ReferrerAssemblyPaths.Contains(path)) Options.ReferrerAssemblyPaths.Add(path);
                         }
                     }
 
-                    if (line.StartsWith("#pragma csf"))
+                    if (line.StartsWith("#pragma f"))
                     {
                         var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        if (lineArray.Length == 3) files.Add(Path.GetFullPath(lineArray[2].Trim()));
+                        if (lineArray.Length == 3 && lineArray[2].StartsWith('"') && lineArray[2].EndsWith('"'))
+                            files.Add(Path.GetFullPath(lineArray[2].Trim('"')));
                     }
 
                     if (line.StartsWith("#pragma assemblyName"))
                     {
                         var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        if (lineArray.Length == 3) assemblyName = lineArray[2].Trim();
+                        if (lineArray.Length == 3)
+                            assemblyName = lineArray[2].Trim('"');
                     }
                 }
             }
@@ -79,7 +82,8 @@ namespace Silmoon.ScriptEngine
 
             foreach (var item in files)
             {
-                if (!Options.ScriptFiles.Contains(item)) Options.ScriptFiles.Add(item);
+                if (!Options.ScriptFiles.Contains(item))
+                    Options.ScriptFiles.Add(item);
             }
 
             return Options;

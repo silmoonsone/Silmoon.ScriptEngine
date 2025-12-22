@@ -1,12 +1,12 @@
-﻿//assemblyName: EAScriptTestAssembly_ScriptProgram
-#pragma ref ../../../../AutoTradingFrameworks/bin/Debug/net9.0/AutoTradingFrameworks.dll
-#pragma dep System.Console
-#pragma dep System.Runtime
-#pragma dep System.Collections
-#pragma dep System.Private.CoreLib
-#pragma dep System.Linq
-#pragma dep Silmoon.ScriptEngine
-#pragma csf ../../../../AutoTradingScripts/ScriptProgram.cs
+﻿//assemblyName: "EAScriptTestAssembly_ScriptProgram"
+#pragma r "../../../../AutoTradingFrameworks/bin/Debug/net10.0/AutoTradingFrameworks.dll"
+#pragma d "System.Console"
+#pragma d "System.Runtime"
+#pragma d "System.Collections"
+#pragma d "System.Private.CoreLib"
+#pragma d "System.Linq"
+#pragma d "Silmoon.ScriptEngine"
+#pragma f "../../../../AutoTradingScripts/ScriptProgram.cs"
 
 using System;
 using AutoTradingFrameworks;

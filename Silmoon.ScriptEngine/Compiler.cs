@@ -15,11 +15,7 @@ namespace Silmoon.ScriptEngine
     {
         public static CSharpCompilationOptions GetDefaultCSharpCompilerOptions()
         {
-            return new CSharpCompilationOptions(
-                    OutputKind.DynamicallyLinkedLibrary,
-                    checkOverflow: true,
-                    optimizationLevel: OptimizationLevel.Release,
-                    deterministic: true);
+            return new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, checkOverflow: true, optimizationLevel: OptimizationLevel.Release, deterministic: true);
         }
         public async Task<CompilerResult> CompileSourceFilesAsync(string assemblyName, IEnumerable<string> filePaths, CSharpCompilationOptions compilationOptions = null, string[] referrerAssemblyPaths = null, string[] referrerAssemblyNames = null, bool isReferrerCurrentAssembly = false)
         {
