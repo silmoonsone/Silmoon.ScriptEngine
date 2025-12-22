@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Silmoon.Extension;
 using Silmoon.Runtime;
-using Silmoon.Runtime.Extensions;
 using Silmoon.Secure;
 using System;
 using System.Collections.Generic;

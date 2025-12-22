@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine", "Silmoon.ScriptEngine\Silmoon.ScriptEngine.csproj", "{959785E0-BBA2-4289-841A-229CE0DD47C5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{CD2DD9B2-53A1-4F71-8624-E0E05937BE73}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine.ServiceHostTesting", "Silmoon.ScriptEngine.ServiceHostTesting\Silmoon.ScriptEngine.ServiceHostTesting.csproj", "{0624426E-754B-43EE-A6AB-FEF87EB9D549}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "支持框架", "支持框架", "{3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{D688F86D-63E9-4B92-AC0B-C3DB806F5341}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,13 +21,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTradingFrameworks", "Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTradingScripts", "AutoTradingScripts\AutoTradingScripts.csproj", "{C67EA20F-F56B-45BE-B486-73EC30665443}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Runtime", "..\Silmoon\Silmoon.Runtime\Silmoon.Runtime.csproj", "{E26F5359-0E32-46DC-87ED-1A4C1C479A8C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon", "..\Silmoon\Silmoon\Silmoon.csproj", "{4473A233-0E3A-4960-85AF-04F5A62B822F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Extension", "..\Silmoon\Silmoon.Extension\Silmoon.Extension.csproj", "{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine.Cli", "Silmoon.ScriptEngine.Cli\Silmoon.ScriptEngine.Cli.csproj", "{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Runtime.Testing", "Silmoon.Runtime.Testing\Silmoon.Runtime.Testing.csproj", "{32CC02FB-EEC0-D875-9CCC-B7DDCC799181}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Runtime.TestingCode", "Silmoon.Runtime.TestingCode\Silmoon.Runtime.TestingCode.csproj", "{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,22 +49,18 @@ Global
 		{C67EA20F-F56B-45BE-B486-73EC30665443}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C67EA20F-F56B-45BE-B486-73EC30665443}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C67EA20F-F56B-45BE-B486-73EC30665443}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E26F5359-0E32-46DC-87ED-1A4C1C479A8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E26F5359-0E32-46DC-87ED-1A4C1C479A8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E26F5359-0E32-46DC-87ED-1A4C1C479A8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E26F5359-0E32-46DC-87ED-1A4C1C479A8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4473A233-0E3A-4960-85AF-04F5A62B822F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4473A233-0E3A-4960-85AF-04F5A62B822F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4473A233-0E3A-4960-85AF-04F5A62B822F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4473A233-0E3A-4960-85AF-04F5A62B822F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32CC02FB-EEC0-D875-9CCC-B7DDCC799181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32CC02FB-EEC0-D875-9CCC-B7DDCC799181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32CC02FB-EEC0-D875-9CCC-B7DDCC799181}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32CC02FB-EEC0-D875-9CCC-B7DDCC799181}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,9 +69,8 @@ Global
 		{0624426E-754B-43EE-A6AB-FEF87EB9D549} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
 		{58939C28-9CB3-4FF6-BD90-325696FC7C16} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
 		{C67EA20F-F56B-45BE-B486-73EC30665443} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
-		{E26F5359-0E32-46DC-87ED-1A4C1C479A8C} = {3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}
-		{4473A233-0E3A-4960-85AF-04F5A62B822F} = {3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}
-		{CC9CD0A0-7578-4502-B2DB-2149423C0AB4} = {3F1B27AB-38E4-4A45-ADB7-C34B8E9211CB}
+		{32CC02FB-EEC0-D875-9CCC-B7DDCC799181} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
+		{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D69BD22F-BE34-4549-ACC6-9FE4041F1431}

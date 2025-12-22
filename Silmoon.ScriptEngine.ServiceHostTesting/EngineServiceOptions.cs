@@ -1,5 +1,4 @@
-﻿using Silmoon.Runtime;
-using Silmoon.ScriptEngine.Options;
+﻿using Silmoon.ScriptEngine.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
