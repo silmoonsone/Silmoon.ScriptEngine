@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine", "Silmoon.ScriptEngine\Silmoon.ScriptEngine.csproj", "{959785E0-BBA2-4289-841A-229CE0DD47C5}"
 EndProject
@@ -23,9 +23,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTradingScripts", "AutoT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.ScriptEngine.Cli", "Silmoon.ScriptEngine.Cli\Silmoon.ScriptEngine.Cli.csproj", "{DCC7D4AC-DF5E-47DF-AE2E-F624CDAA8773}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Runtime.Testing", "Silmoon.Runtime.Testing\Silmoon.Runtime.Testing.csproj", "{32CC02FB-EEC0-D875-9CCC-B7DDCC799181}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptEngine.Testing", "ScriptEngine.Testing\ScriptEngine.Testing.csproj", "{32CC02FB-EEC0-D875-9CCC-B7DDCC799181}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silmoon.Runtime.TestingCode", "Silmoon.Runtime.TestingCode\Silmoon.Runtime.TestingCode.csproj", "{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptEngine.TestingCode", "ScriptEngine.TestingCode\ScriptEngine.TestingCode.csproj", "{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutoTradingTesting", "AutoTradingTesting", "{31A89A28-25B0-490B-89DF-9EA17187B96E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,9 +68,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{0624426E-754B-43EE-A6AB-FEF87EB9D549} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
-		{58939C28-9CB3-4FF6-BD90-325696FC7C16} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
-		{C67EA20F-F56B-45BE-B486-73EC30665443} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
+		{0624426E-754B-43EE-A6AB-FEF87EB9D549} = {31A89A28-25B0-490B-89DF-9EA17187B96E}
+		{58939C28-9CB3-4FF6-BD90-325696FC7C16} = {31A89A28-25B0-490B-89DF-9EA17187B96E}
+		{C67EA20F-F56B-45BE-B486-73EC30665443} = {31A89A28-25B0-490B-89DF-9EA17187B96E}
 		{32CC02FB-EEC0-D875-9CCC-B7DDCC799181} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
 		{D9FD5345-C877-9F2B-5EEE-7D16EB47CF83} = {CD2DD9B2-53A1-4F71-8624-E0E05937BE73}
 	EndGlobalSection
