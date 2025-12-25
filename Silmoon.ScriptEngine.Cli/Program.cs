@@ -33,9 +33,10 @@ internal class Program
     }
     static async Task compile()
     {
-        var file = Args.GetParameter("--file");
-        var output = Args.GetParameter("--output");
-        //var file = "I:\\Git\\GitHub\\silmoonsone\\Silmoon.ScriptEngine\\AuthTradingScripts\\EAScript1.cs";
+        var file = Args.GetParameter("file");
+        var output = Args.GetParameter("output");
+        if (output.IsNullOrEmpty()) output = Path.GetFileNameWithoutExtension(file) + ".csj";
+        //var file = "H:\\Git\\GitHub\\silmoonsone\\Silmoon.ScriptEngine\\AutoTradingScripts\\EAScript1.cs";
         //var output = ".\\bin.csj";
         var engine = new EngineCompiler(new EngineCompilerOptions()
         {
@@ -73,6 +74,6 @@ internal class Program
     {
         Console.WriteLine("Usage: Silmoon.ScriptEngine.Cli [command] [options]");
         Console.WriteLine("Commands:");
-        Console.WriteLine("  compile --file [file] --output [output]");
+        Console.WriteLine("\tcompile --file [file] --output [output]");
     }
 }

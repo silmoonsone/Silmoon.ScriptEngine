@@ -1,8 +1,11 @@
-﻿using System.Text;
+﻿#pragma f "IStorage.cs"
+#pragma f "Storage.cs"
 
-namespace Silmoon.Runtime.TestingCode;
+using System.Text;
 
-public class MyStorage : Storage, IStorage
+namespace ScriptEngine.TestingCode;
+
+public class MyStorage : Storage, IMy
 {
     public MyStorage()
     {
@@ -20,4 +23,8 @@ public class MyStorage : Storage, IStorage
     {
         Console.WriteLine("Finalized");
     }
+}
+public interface IMy
+{
+
 }

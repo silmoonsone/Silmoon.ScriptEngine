@@ -40,6 +40,8 @@ namespace Silmoon.ScriptEngine
             string assemblyName = Options.AssemblyName;
             foreach (var item in Options.ScriptFiles)
             {
+                string sourceCodeBaseDirectory = Path.GetDirectoryName(item);
+
                 if (!File.Exists(item)) continue;
                 string[] lines = File.ReadAllLines(item);
                 foreach (var line in lines)
@@ -57,7 +59,12 @@ namespace Silmoon.ScriptEngine
                         var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                         if (lineArray.Length == 3 && lineArray[2].StartsWith('"') && lineArray[2].EndsWith('"'))
                         {
-                            var path = Path.GetFullPath(lineArray[2].Trim('"'));
+                            var path = lineArray[2].Trim('"');
+
+                            if (Path.IsPathRooted(path)) path = Path.GetFullPath(path);
+                            else path = Path.GetFullPath(Path.Combine(sourceCodeBaseDirectory, path));
+
+
                             if (!Options.ReferrerAssemblyPaths.Contains(path)) Options.ReferrerAssemblyPaths.Add(path);
                         }
                     }
@@ -66,7 +73,14 @@ namespace Silmoon.ScriptEngine
                     {
                         var lineArray = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                         if (lineArray.Length == 3 && lineArray[2].StartsWith('"') && lineArray[2].EndsWith('"'))
-                            files.Add(Path.GetFullPath(lineArray[2].Trim('"')));
+                        {
+                            var path = lineArray[2].Trim('"');
+
+                            if (Path.IsPathRooted(path)) path = Path.GetFullPath(path);
+                            else path = Path.GetFullPath(Path.Combine(sourceCodeBaseDirectory, path));
+
+                            if (!files.Contains(path)) files.Add(path);
+                        }
                     }
 
                     if (line.StartsWith("#pragma assemblyName"))

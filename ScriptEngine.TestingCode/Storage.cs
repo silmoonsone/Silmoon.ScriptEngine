@@ -1,7 +1,7 @@
 global using System;
 global using System.Collections.Generic;
 
-namespace Silmoon.Runtime.TestingCode;
+namespace ScriptEngine.TestingCode;
 
 public class Storage : IStorage
 {
@@ -24,6 +24,7 @@ public class Storage : IStorage
     public void Test()
     {
         Console.WriteLine("Test");
-        Environment.Exit(0);
+        //Console.WriteLine("force exit");
+        //Environment.Exit(0);
     }
 }

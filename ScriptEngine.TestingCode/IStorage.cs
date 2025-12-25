@@ -1,4 +1,4 @@
-namespace Silmoon.Runtime.TestingCode;
+namespace ScriptEngine.TestingCode;
 
 public interface IStorage
 {

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Silmoon" Version="2.0.3" />
+    <PackageReference Include="Silmoon" Version="2.0.4" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
 

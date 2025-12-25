@@ -19,17 +19,14 @@ namespace Silmoon.ScriptEngine.Extensions
         {
             // 使用 HashSet 记录接口名称，确保接口的唯一性
             var interfaces = new List<InterfaceImplementation>();
-            var interfaceNames = new HashSet<string>();
+            var interfaceNames = new HashSet<TypeReference>();
 
             // 添加当前类型的接口
             if (type.HasInterfaces)
             {
                 foreach (var iface in type.Interfaces)
                 {
-                    if (interfaceNames.Add(iface.InterfaceType.FullName)) // 只有当名称未被添加时才加入
-                    {
-                        interfaces.Add(iface);
-                    }
+                    if (interfaceNames.Add(iface.InterfaceType)) interfaces.Add(iface);
                 }
             }
 
@@ -41,10 +38,7 @@ namespace Silmoon.ScriptEngine.Extensions
                 {
                     foreach (var baseInterface in baseType.Interfaces)
                     {
-                        if (interfaceNames.Add(baseInterface.InterfaceType.FullName)) // 避免重复
-                        {
-                            interfaces.Add(baseInterface);
-                        }
+                        if (interfaceNames.Add(baseInterface.InterfaceType)) interfaces.Add(baseInterface);
                     }
                 }
             }
@@ -62,19 +56,17 @@ namespace Silmoon.ScriptEngine.Extensions
             var baseTypes = new List<TypeDefinition>();
             var current = type.BaseType;
 
-            // 迭代遍历所有基类
             while (current != null)
             {
-                var resolvedBaseType = current.Resolve();
-                if (resolvedBaseType != null)
+                try
                 {
-                    baseTypes.Add(resolvedBaseType);
-                    current = resolvedBaseType.BaseType;
+                    TypeDefinition? resolved = current.Resolve();
+                    if (resolved is null) break;
+
+                    baseTypes.Add(resolved);
+                    current = resolved.BaseType;
                 }
-                else
-                {
-                    break; // 如果无法解析，停止
-                }
+                catch { throw; }
             }
 
             return baseTypes;

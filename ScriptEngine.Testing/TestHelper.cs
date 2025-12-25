@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Silmoon.Runtime.Testing
+namespace ScriptEngine.Testing
 {
     public static class TestHelper
     {

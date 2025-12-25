@@ -43,7 +43,7 @@ namespace Silmoon.ScriptEngine
                 InstanceAssembly = Context.LoadFromStream(codeStream);
                 Type = InstanceAssembly.GetType(EngineExecuteContext.Options.EntryTypeFullName);
 
-                OnOutput?.Invoke($"AssemblyLoadContext{(Context.Name.IsNullOrEmpty() ? "(unname!)" : $"({Context.Name})")}, Assembly({InstanceAssembly.GetName().Name}) loaded.");
+                OnOutput?.Invoke($"AssemblyLoadContext{(Context.Name.IsNullOrEmpty() ? "(unnamed assembly)" : $"({Context.Name})")}, Assembly({InstanceAssembly.GetName().Name}) loaded.");
 
                 if (Type is null)
                 {
@@ -61,13 +61,15 @@ namespace Silmoon.ScriptEngine
                 return false.ToStateSet("Assembly load failed(" + ex.Message + ").");
             }
         }
-        public void CreateInstance()
+        public StateSet<bool, T> CreateInstance()
         {
             if (Type is not null)
             {
                 Instance = (T)Activator.CreateInstance(Type);
                 OnOutput?.Invoke($"Instance({InstanceAssembly.GetName().Name}::{Type.FullName}){(EngineExecuteContext.Options.AssemblyLoadContextName.IsNullOrEmpty() ? string.Empty : $" created on {EngineExecuteContext.Options.AssemblyLoadContextName}")}.");
+                return true.ToStateSet(Instance);
             }
+            else return false.ToStateSet(Instance, "Type is null, can not create instance.");
         }
         public void UnloadAssembly()
         {
