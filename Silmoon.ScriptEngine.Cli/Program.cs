@@ -13,6 +13,7 @@ internal class Program
         Args.ParseArgs(args);
         await Entry(args);
         //await compile();
+        //await run();
     }
     static async Task Entry(string[] args)
     {
@@ -25,6 +26,9 @@ internal class Program
                 case "compile":
                     await compile();
                     break;
+                //case "run":
+                //    await run();
+                //    break;
                 default:
                     Console.WriteLine($"Unknown command: {Args.ArgsArray[0]}");
                     break;
@@ -38,23 +42,22 @@ internal class Program
         if (output.IsNullOrEmpty()) output = Path.GetFileNameWithoutExtension(file) + ".csj";
         //var file = "H:\\Git\\GitHub\\silmoonsone\\Silmoon.ScriptEngine\\AutoTradingScripts\\EAScript1.cs";
         //var output = ".\\bin.csj";
-        var engine = new EngineCompiler(new EngineCompilerOptions()
+        var options = new EngineCompilerOptions()
         {
             ScriptFiles = [file],
-        });
-        //engine.Preprocess();
-        //Console.Write("Checking...");
-        //var files = engine.CheckFiles();
-        //if (!files.State)
-        //{
-        //    Console.Write(files.Message);
-        //    return;
-        //}
-        //Console.Write("OK");
-        //Console.WriteLine();
-        //Console.Write("Compiling...");
+        };
+        options.AddCoreReferrer();
+        var engine = new EngineCompiler(options);
         var result = await engine.Compile();
-        if (!result.State && result.Data.Success)
+        if (result.State && result.Data.Success)
+        {
+            Console.Write("OK");
+            Console.WriteLine();
+            byte[] csjData = result.Data.GetEngineExecuteModelBinary(engine.Options);
+            File.WriteAllBytes(output, csjData);
+            Console.WriteLine($"Output to {Path.GetFullPath(output)}");
+        }
+        else
         {
             Console.Write("Failed");
             Console.WriteLine();
@@ -62,13 +65,15 @@ internal class Program
             {
                 Console.WriteLine(item.GetMessage());
             }
-            return;
         }
-        Console.Write("OK");
-        Console.WriteLine();
-        byte[] csjData = result.Data.GetEngineExecuteModelBinary(engine.Options);
-        File.WriteAllBytes(output, csjData);
-        Console.WriteLine($"Output to {Path.GetFullPath(output)}");
+    }
+    static async Task run()
+    {
+        var filePath = Args.GetParameter("file");
+        var fileData = File.ReadAllBytes(filePath);
+
+        //var fileData = File.ReadAllBytes(@"C:\Users\silmoon\Desktop\main.csj");
+        EngineExecuter engineExecuter = new EngineExecuter(fileData);
     }
     static void Help()
     {
