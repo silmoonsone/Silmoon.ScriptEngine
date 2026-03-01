@@ -1,4 +1,4 @@
-﻿using Silmoon.Extension;
+﻿using Silmoon.Extensions;
 using Silmoon.ScriptEngine.Options;
 using System;
 using System.Collections.Generic;

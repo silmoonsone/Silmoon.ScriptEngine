@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Silmoon;
-using Silmoon.Extension;
+using Silmoon.Extensions;
 using Silmoon.ScriptEngine;
 using Silmoon.ScriptEngine.Extensions;
 using Silmoon.ScriptEngine.Options;

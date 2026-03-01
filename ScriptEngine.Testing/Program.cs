@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Mono.Cecil;
 using Silmoon;
-using Silmoon.Extension;
+using Silmoon.Extensions;
 using Silmoon.Secure;
 using Mono.Cecil.Rocks;
 using ScriptEngine.Testing;

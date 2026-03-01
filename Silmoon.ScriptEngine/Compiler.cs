@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Silmoon;
-using Silmoon.Extension;
+using Silmoon.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
